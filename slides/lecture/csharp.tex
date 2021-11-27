@@ -19,4 +19,195 @@
   }}
 }
 
+\section{Basic OO in C\#}
+\newcommand{\codepath}[1]{../../code/lecture-01/#1}
+
+\frs{5}{Brief introduction to C\#}{
+  \bl{C\#}{\iz{
+    \item Designed by Anders Hejlsberg around 2000 at Microsoft
+    \item Is part of the .NET initiative, designed to compile over the Common Language Infrastructure (CLI)
+    \item Current version is 9.0, released in 2020 for .NET 5.0
+    \item Mono is a free, open-source compiler and runtime environment
+    \item Initially developed as very similar to Java, then somewhat diverged
+    }}
+  \fg{height = 0.4\textheight}{img/NET.jpg}
+}
+
+\frs{20}{Features of C\#}{
+  \bl{Ingredients}{\iz{
+    \item C-like language: the imperative and structured part are very similar
+    \item Java-like language: essentially very similar to Java, specially at the beginning
+    \item Static and strong typing: types are checked at run-time, preventing ill-typed operations
+    \item Object-orientation: object by references, automatic garbage collection
+    \item Functional-orientation: extension methods, generics, delegates, lambdas
+    }}
+  \bl{Philosophy}{\iz{
+    \item aiming at high expressiveness and richness, though become a rather ``large'' language
+  }}
+  \fg{height = 0.4\textheight}{img/sizes.png}
+}
+
+\fr{C\# types: we start with Simple Types and Class Types}{
+  \fg{height = 0.6\textheight}{img/datatypes.png}
+}
+  
+\frs{20}{Variables: initialisation and inference}{
+  \bl{On variables -- essentially as in Java}{\iz{
+  \item Same rules on scoping, and assignment
+  \item Similar distinction between primitive and class types
+  \item Similar naming conventions for variables
+  \item \texttt{null} is assignable to variables of reference types
+  \item Can use \texttt{var} to declare a variable with type to be inferred
+  }}
+  \codeview{3}{9}{23}{\scriptsize}{\codepath{InitialExamples/Initialisation.cs}}
+}
+
+\frs{5}{C\# classes}{
+  \bl{The core of OOP is essentially as in Java} {\iz{
+    \item Classes, methods, fields, and constructors have same syntax and semantics
+    \item Class instantiation, method invocation, field access have same syntax and semantics
+    \item Static, non-static fields/methods have same syntax/semantics
+    \item A source file must define the namespace (similar to Java package)
+    \item Can use \cil{string} or \cil{String} for strings -- prefer the former
+    \item Syntax for calling a constructor from another constructor is different
+  }}
+  \bl{Formatting}{\iz{
+    \item Slightly different conventions on formatting braces 
+    \item Methods start with an uppercase, fields with an underscore
+    \item \myurl {https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/inside-a-program/coding-conventions}
+  }}
+}
+
+\frs{5}{\Cil{Point3D}}{
+\codeview{0}{2}{34}{\tiny}{\codepath{Point3D/Program.cs}}
+}
+
+\fr {C\# executable programs} {
+   \bl {Building blocks of C\# software} {\iz {
+     \item class libraries shipped with .NET
+     \item possibly other external libraries 
+     \item a set of classes that make up the application we build (like \cil{Point3D)}
+     \item at least one of these classes has a special method \cil{Main}
+     \item a \cil {Main} is the entry point of a program
+   }}
+   \bl{The \cil {Main} must have the following declaration: }{\iz {
+   \item \cil {public static void Main() \{.. \}}
+    \item there could be variant with different inputs, outputs, and visibility, but we won't see them now
+    \item it is key it is call \cil{Main} and is \cil{static}
+    \item \cil{static} means this method is ``shared'' among all objects, and is conceptually called to the class, not to the object
+   }}
+}
+
+\frs{15}{Typical structure of an executable project} {
+   \bl{Entry point class} {\iz {
+     \item it contains the \cil{Main} method
+     \item typically, it contains only that method
+   }}
+   \bl{Other classes}{\iz{
+     \item contain the various application classes
+   }}
+   \bl{Source files}{\iz{
+    \item have \cil{.cs} extension
+    \item start with ``\cil{using}'' clauses to declare other classes they use
+    \item declared one or more classes, enclosing them in \cil{namespace}s
+    \item a \cil{namespace} is a ``module'' giving a context to the class
+   }}
+   \bl{Project}{\iz{
+    \item has a name
+    \item has one or many sources
+    \item specify additional properties, and dependencies (references to other projects)
+   }}
+}
+
+\fr{A class \Cil{Person}}{
+\codeview{1}{5}{34}{\tiny}{\codepath{Person/Program.cs}}
+}
+
+\frs{10}{Constructors chaining}{
+\codeview{1}{5}{37}{\tiny}{\codepath{PersonChaining/Program.cs}}
+}
+
+\frs{10}{Playing with libraries (namespace \Cil{System})}{
+\codeviewall{\tiny}{\codepath{PlayWithLibraries/Program.cs}}
+}
+
+\frs{10}{State, Getters and Setters}{
+    \bl{An object state}{\iz{
+        \item an object carries a state, in the form of a structure set of data
+        \item internally this is represented by a set of named and typed fields, which are private
+        \item externally this is represented by a set of named and typed ``properties''
+        \item such properties may or may not overlap with fields
+        \item to make such properties accessible to clients, specific methods are needed
+    }}
+    \bl{Getters and Setters}{\iz{
+        \item a common solution in OOP (will see C\# will improve it)
+        \item a getter is method \cil{GetXYZ} with 0-args, returning the property \cil{XYZ}'s value, and typically causing no side-effect
+        \item a getter is a method \cil{SetXYZ} taking the property \cil{XYZ}'s value and returning nothing
+        \item properties that one only wants to read have no setter, and vice-versa for getters
+    }}
+}
+
+\frs{5}{\Cil{Person} with Getters and Setters}{
+\codeview{1}{18}{48}{\tiny}{\codepath{PersonGetters/Program.cs}}
+}
+
+\fr{Client code for \Cil{Person}}{
+\codeview{2}{7}{16}{\scriptsize}{\codepath{PersonGetters/Program.cs}}
+}
+
+\fr{Expression-bodied members}{
+    \bl{Syntax: \texttt{<member> => expression; }}{\iz{
+        \item can be used for methods and constructors
+        \item when their body is a single return of an expression, or just a single statement...
+        \item you can directly indicate the signature, \texttt{=>}, and that expression/statement
+        \item it makes your programs more short and readable: use them!
+    }}
+}
+
+\fr{\Cil{Person} with Expression-bodied methods}{
+\codeview{1}{18}{39}{\ssmall}{\codepath{PersonExpBody/Program.cs}}
+}
+
+\fr{Immutability}{
+    \bl{Design for immutability}{\iz{
+        \item by choosing which property has a Setter we can decide that there is information that cannot be changed, and this is important to avoid clients to badly affect the behaviour of our objects
+    }}
+    \bl{Readonly fields}{\iz{
+        \item the same has to be done for fields: if a field is initialised at construction time and then never changed, we shall use modifier \cil{readonly}
+        \item this enhance clarity of programs, and the compiler check we do not alter such fields
+    }}
+}
+
+
+\frs{15}{Properties}{
+    \bl{Improving over Get/Set accessors}{\iz{
+        \item C\# introduces a programming construct for properties
+        \item a property is directly perceived by the client as a sort of field (starting with uppercase)
+        \item internally to a class, a property is actually a getter and/or setter with special syntax
+    }}
+    \bl{Notation}{\iz{
+        \item \cil{public <type> <name>\{ get \{...\} set \{...\} \}}
+        \item the body of \cil{get} should return a value
+        \item the body of \cil{set} can use a special variable \cil{value}
+        \item for both we can use expression-bodied get/set
+        \item can use expression-bodied readonly property in one line
+    }}
+    \bl{The special case of auto-implemented properties}{\iz{
+        \item if the body of \cil{get} and \cil{set} are entirely skipped, a field with same name of the property is implicitly defined
+    }}
+}
+
+\fr{\Cil{Person} with Properties}{
+\codeview{1}{5}{33}{\tiny}{\codepath{PersonProperties/Program.cs}}
+}
+
+\frs{5}{\Cil{Person} with Properties: playing with properties}{
+\codeview{1}{20}{50}{\tiny}{\codepath{PersonPropertiesPlay/Program.cs}}
+}
+
+\fr{Playing with properties: client code}{
+\codeview{2}{7}{18}{\scriptsize}{\codepath{PersonPropertiesPlay/Program.cs}}
+}
+
+
 \end{document}
