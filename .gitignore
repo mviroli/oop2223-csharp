@@ -1,0 +1,51 @@
+syntax: glob
+
+# No backup files 
+*~
+.~*
+
+# No .class
+*.class
+
+# No temp latex
+*.gz
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb
+.recommenders
+
+# No spurious
+.fuse*
+*.backup
+.~
+.directory
+.DS_Store
+*.index
+*.lck
+*META*
+
+# folders
+**/lecture-*/*.pdf
+*.zip
+*.fls
+*.fdb_latexmk
+
+/.metadata/
+**/obj/
+**/bin/
+**/.idea/
+**/.idea_modules/
+**/cmake-build-*/
+**/out/
+
+*.iws
+
+**/atlassian-ide-plugin.xml
+**/com_crashlytics_export_strings.xml
+**/crashlytics.properties
+**/crashlytics-build.properties
+**/fabric.properties
