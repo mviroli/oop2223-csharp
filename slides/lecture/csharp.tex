@@ -1,7 +1,17 @@
 \documentclass[presentation]{beamer}
 \usepackage{common}
+\usepackage{arydshln}
+
+\newcommand{\cscat}[1]{$\langle\text{{\itshape#1}}\rangle$}
+\newcommand{\csopt}[1]{{\itshape[#1]}}
+\newcommand{\csalt}[1]{{\itshape(#1)}}
+\newcommand{\op}[1]{\alert{`\texttt{#1}'}}
+\newcommand{\operand}[1][\ldots]{{\normalcolor#1}}
+\newcommand{\literal}[1]{\texttt{\alert{#1}}}
+\newcommand{\bs}{$\backslash$}
 
 \title[\lecturecode{C\#}]{Object-oriented programming in C\#}
+
 
 \begin{document}
 
@@ -131,6 +141,7 @@
     \item Classes, methods, fields, and constructors have same syntax and semantics
     \item Class instantiation, method invocation, field access have same syntax and semantics
     \item Static, non-static fields/methods have same syntax/semantics
+    \item Structured programming constructs (if/while) have same syntax/semantics
     \item A source file must define the namespace (similar to Java package)
     \item Syntax for calling a constructor from another constructor is different
   }}
@@ -274,6 +285,136 @@
 
 \section{Some specific C\#/.NET mechanisms}
 \renewcommand{\codepath}[1]{../../code/lecture-02/#1}
+
+\subsubsection{Arrays}
+
+\begin{frame}{\dotnet Arrays}
+    \begin{block}{Array types}
+        \begin{description}
+            \item[\texttt{\textit{T}\alert{[]}}] denotes the \alert{array of \texttt{\textit{T}}} type
+            \item[\texttt{\textit{T}\alert{[][]}}] denotes the \alert{array of \emph{arrays of} \texttt{\textit{T}}} type
+            \item[\texttt{\textit{T}\alert{[][][]}}] denotes the \alert{array of \emph{arrays of arrays of} \texttt{\textit{T}}} type
+            \item[\texttt{\textit{T}\alert{[][,]}}] denotes the \alert{array of \emph{2-dimensional arrays of} \texttt{\textit{T}}} type
+            \item[\texttt{\textit{T}\alert{[,,][]}}] denotes the \alert{3-dimensional array of \emph{arrays of} \texttt{\textit{T}}} type
+        \end{description}
+    \end{block}
+\end{frame}
+\begin{frame}[shrink=5]{\dotnet Arrays}
+    \begin{block}{Arrays features}
+        \begin{itemize}
+            \item All array types are \alert{reference} types
+            %
+            \begin{itemize}
+                \item arrays of value types are reference types as well
+            \end{itemize}
+
+            \item All array types are subtypes of the \texttt{Array} class
+
+            \item Arrays are constructed by sizes, i.e. $D_1, \ldots, D_N$ are user-provided
+            %
+            \begin{itemize}
+                \item so memory can be contigously allocated
+                \item items are initialised to their default values
+            \end{itemize}
+
+            \item All array types come with 3 useful properties/methods:
+            %
+            \begin{description}
+                \item[\texttt{Rank}] returning the total amount of dimensions of the array (i.e. $N$)
+                \item[\texttt{Length}] returning the total amount of items in the array (i.e. $D_1 \times \ldots \times D_N$)
+                \item[\texttt{GetLength($i$)}] returning the total amount of items along the $i$-th dimension (i.e. $D_i$)
+            \end{description}
+
+            \item Access to items is performed via the indexed-access operator:
+            %
+            \begin{center}
+                \op{\operand[array][\operand[index$_1$, \ldots, index$_N$]]}  
+            \end{center}
+        \end{itemize}
+    \end{block}
+\end{frame} 
+
+\begin{frame}[allowframebreaks]{Array Types Instantiation}
+    \begin{block}{Constructors for $N$-dimensional Arrays of \texttt{\textit{T}}}
+        \begin{center}\ttfamily
+            \textit{T}[\alert{,,}\ldots{}] \cscat{Var Name} = \alert{new} \textit{T}[\alert{$D_1$}, \alert{$D_2$}, \ldots];
+        \end{center}
+        %
+        \begin{itemize}
+            \item Number of commas in the left-hand side: $N-1$
+            \item Number of sizes in the right-hand side: $N$
+        \end{itemize}
+    \end{block}
+    \begin{block}{Literal Array Expressions for $N$-dimensional Arrays of \texttt{\textit{T}}}
+        \begin{center}\ttfamily
+            \textit{T}[\alert{,,}\ldots{}] \cscat{Var Name} = \alert{new} \textit{T}[\alert{,,}\ldots{}] 
+                \alert{\{\ldots\{} \cscat{Item$_1$}, \cscat{Item$_2$}, \ldots  \alert{\}\ldots\}};
+        \end{center}
+        %
+        \begin{itemize}
+            \item Number of commas in the left-hand side: $N-1$
+            \item Number of nesting levels of braces in the right-hand side: $N$
+            \item Repeating \texttt{\textit{T}[\alert{,,}\ldots{}]} may be avoided in the right-hand side
+        \end{itemize}
+    \end{block}
+
+    \framebreak
+    
+    \codeview{3}{9}{24}{\tiny}{\codepath{Snippets/Snippet6Arrays.cs}}
+
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Accessing Arrays Items}
+    \codeview{2}{27}{41}{\tiny}{\codepath{Snippets/Snippet6Arrays.cs}}
+
+    \codeview{2}{43}{52}{\tiny}{\codepath{Snippets/Snippet6Arrays.cs}}
+
+\end{frame}
+
+\subsubsection{Nullables}
+
+\begin{frame}[shrink=5]{\dotnet Nullables}
+    \bl{Nullable types definition}{\iz{
+        \item let \texttt{\textit{T}} by a \alert{value} type of any sort, then \texttt{\textit{T}\alert{?}} denotes the \alert{nullable \texttt{\textit{T}}} type
+
+        \item A nullable type \texttt{\textit{T}?} can be defined as \texttt{\textit{T}} $\cup$ \{ \texttt{null} \}.
+        %
+        \item A variable of type \texttt{\textit{T}?} can be assigned with any admissible value of \texttt{\textit{T}}, \alert{or} with \texttt{null}
+        }
+        
+        {\tiny (cf. \url{https://docs.microsoft.com/dotnet/csharp/language-reference/builtin-types/nullable-value-types})}
+    }
+    \begin{block}{Nullables features}
+        \begin{itemize}
+            \item All nullable types are \alert{value} types
+
+            \item The notation \texttt{\textit{T}?} is another way of writing \texttt{Nullable<\textit{T}>}
+            %
+            \item All nullable types come with some useful properties:
+            %
+            \begin{description}
+                \item[\texttt{HasValue}] returning null if the object is null
+                \item[\texttt{Value}] returning the non-null value, if present
+            \end{description}
+
+            \item When non-null, nullable-type variables behave like they non-nullable counterparts
+        \end{itemize}
+    \end{block}
+    
+\end{frame}
+
+\begin{frame}{Nullable Types Operators}
+    \begin{block}{}
+        \begin{itemize}
+            \item Operator \cil{??} gets the value or a default if null
+
+            \item Operator \cil{?.} calles a method on a nullable only if not null, otherwise it does nothing and yields null
+        \end{itemize}
+    \end{block}
+
+    \codeview{3}{9}{19}{\scriptsize}{\codepath{Snippets/Snippet7Nullables.cs}}
+\end{frame}
+
 
 
 \end{document}
