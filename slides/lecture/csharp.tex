@@ -15,13 +15,22 @@
 
 \begin{document}
 
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Next In Line\ldots}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
 \frame[label=coverpage]{\titlepage}
 
 \fr{Outline}{
   \bl{Parts}{\en{
     \item Basic OO concepts in C\#
     \item Some specific C\#/.NET mechanisms
-    \item Encapsulation, interfaces, inheritance
+    \item Encapsulation, interfaces
+    \item Inheritance
     \item Generics
     \item Exceptions and some key C\# libraries
     \item Functional programming in C\#
@@ -283,7 +292,7 @@
 \codeview{2}{7}{18}{\scriptsize}{\codepath{PersonPropertiesPlay/Program.cs}}
 }
 
-\section{Some specific C\#/.NET mechanisms}
+\section{Some specific C\# mechanisms}
 \renewcommand{\codepath}[1]{../../code/lecture-02/#1}
 
 \subsubsection{Arrays}
@@ -408,13 +417,265 @@
         \begin{itemize}
             \item Operator \cil{??} gets the value or a default if null
 
-            \item Operator \cil{?.} calles a method on a nullable only if not null, otherwise it does nothing and yields null
+            \item Operator \cil{?.} calls a method on a nullable only if not null, otherwise it does nothing and yields null
         \end{itemize}
     \end{block}
 
     \codeview{3}{9}{19}{\scriptsize}{\codepath{Snippets/Snippet7Nullables.cs}}
 \end{frame}
 
+\section{Encapsulation, interfaces}
+\renewcommand{\codepath}[1]{../../code/lecture-03/#1}
+
+\subsection{Encapsulation, and properties}
+
+\frs{5}{Encapsulation}{
+  \bl{Two crucial ingredients of OO programming}{\en{
+    \item Packing data + functions to manipulate it
+    \item Information hiding via careful access control
+  }}
+  \bl{Philosophy}{\iz{
+    \item Each class declares \cil{public} only those (few) methods/properties/constructors necessary to interact with (or create) its instances
+    \item The rest (which therefore includes mere implementation aspects) is \cil{private}{\iz{
+      \item methods/constructors/properties for internal use only
+      \item{\bf{all}} fields (i.e. internal status)
+    }}
+  }}
+  \bl{Encapsulation and dependencies}{In this way the ``client'' is weakly influenced by possible future modifications concerning mere implementation aspects.
+  }
+}
+
+\frs{5}{A basic case: class \Cil{Counter}}{
+    \codeview{1}{18}{40}{\scriptsize}{\codepath{Counter/Program.cs}}
+}
+
+\fr{A basic case: usage of class \Cil{Counter}}{
+    \codeview{1}{5}{16}{\scriptsize}{\codepath{Counter/Program.cs}}
+}
+
+
+\fr{Encapsulation is preserved by properties!}{
+    \codeview{1}{5}{25}{\ssmall}{\codepath{CounterProperties/Program.cs}}
+}
+
+\fr{A transparent modification to the \Cil{Counter} implementation}{
+    \codeview{1}{28}{47}{\ssmall}{\codepath{CounterProperties/Program.cs}}
+}
+
+\fr{A final bit on properties: object initializers}{
+    \codeview{1}{5}{32}{\ssmall}{\codepath{ObjectInitializer/Program.cs}}
+}
+
+\fr{Properties vs methods vs fields: recap}{
+    \bl{``Properties are just methods''}{\iz{
+        \item a read-only property is essentially a Getter
+        \item a read-write property is essentially a pair of Getter and Setter method
+        \item most discussions in the following focus on methods, and applicability to properties naturally derive
+    }}
+    \bl{``Properties define a nice abstraction''}{\iz{
+        \item from the design viewpoint, public properties are much nicer than Getters/Setters, which are still the OOP standard
+    }}
+    \bl{``Properties can replace fields''}{\iz{
+        \item as an implementation mechanism, auto-implemented properties are a good replacement for fields
+        \item but this is just matter of internal implementation
+    }}
+}
+
+\subsection{Interfaces}
+
+
+\frs{10}{C\# \Cil{interfaces}}{
+  \bl{What is an \cil{interface}}{\iz{
+    \item It is a new declarable \alert{reference type} (like classes)
+    \item It has a name, and includes a set of method signatures (and properties)
+    \item It cannot be used to create objects the \cil{new} operator
+  }}
+  \bl{An \cil{interface} \cil{I} can be ``implemented'' by a class}{\iz{
+    \item Through a class \cil{C} that explicitly declares it (\cil{class C : I \{.. \}})
+    \item \cil{C} will define (the body of) all methods declared in \cil{I}
+    \item An instance object of \cil{C}, will have the usual \cil{C} type, but also \cil{I}
+    \item namely, type \cil{C} is a subtype of \cil{I}
+    \item C\# convention for interface names: \cil{IDevice}, \cil{IPerson}, \dots
+    \item later versions of C\# provide default methods for interfaces
+  }}
+  \bl{Substitutability}{\iz{
+    \item As usual in OOP: an object created by a class implementing an interface can be passed to where an element of the interface is expected
+  }}
+}
+
+\fr{Interface \Cil{IDevice}}{
+\bx{\cil{IDevice} introduce a contract for devices: they provide services to be switched on, switched off, and to check if they are on.}
+\codeview{1}{5}{12}{\small}{\codepath{SmartHome/Program.cs}}
+}
+
+\frs{5}{Two lamp implementations of \Cil{Device}}{
+  \codeview{1}{14}{38}{\ssmall}{\codepath{SmartHome/Program.cs}}
+}
+
+\frs{5}{Multiple implementation}{
+  \bl{Multiple implementation}{Possible declaration: \cil{class C : I1, I2, I3 \{.. \}}
+  \iz{
+    \item A class \cil{C}  implements \cil{I1} and \cil{I2} and \cil{I3}
+    \item The class \cil{C}  ust provide a body for all methods of \cil{I1}, all those of \cil{I2}, all those of \cil{I3}{\iz{
+      \item if \cil{I1}, \cil{I2}, \cil{I3} had common methods there would be no problem, each one should be implemented only once
+    }}
+    \item Instances of \cil{C} have type \cil{C}, but also types \cil{I1}, \cil{I2} and \cil{I3}
+  }}
+  \bl{Extension}{Possible declaration: \cil{interface I : I1, I2, I3 \{.. \}}
+  \iz{
+    \item An interface \cil{I} defines certain methods, in addition to those of \cil{I1}, \cil{I2}, \cil{I3}
+    \item A class \cil{C} that implements \cil{I} must provide a body for all methods indicated in \cil{I}, plus all those of \cil{I1}, all those of \cil{I2}, and all those of \cil{I3}
+    \item Instances of \cil{C} have type \cil{C}, but also types \cil{I}, \cil{I1}, \cil{I2} and \cil{I3}
+  }}
+}
+
+\section{Inheritance}
+\renewcommand{\codepath}[1]{../../code/lecture-04/#1}
+
+\subsection{Class extension}
+
+\fr{Inheritance}{
+  \bx{
+    It is a mechanism that allows you to define a new class \alert{specialising} an existing one, that is, ``inheriting'' its members (the private ones are not directly visible), possibly modifying / adding new members, and therefore reusing code already written and tested.
+  }
+  \bl{Inheritance is a key concept of OOP}{\iz{
+    \item It is related to the interface mechanism
+    \item It is one of the key elements along with encapsulation and interfaces
+    \item It not only affects code reuse, but also the resulting polymorphism
+  }}
+  \bl{Abstract classes}{\iz{
+    \item dealt with in a completely standard way, we won't consider them further here
+  }}
+}
+
+
+\fr{Basic example: \Cil{Counter}}{
+\codeview{1}{5}{25}{\scriptsize}{\codepath{Counter/Program.cs}}
+}
+
+\frs{15}{The need to extend and modify}{
+  \bl{The inheritance mechanism can be used for a multicounter}{\iz{
+    \item Definition: \cil{class C : D \{.. \}}
+    \item The new \cil{C} class inherits all members of \cil{D}{\iz{
+      \item The private members are not directly accessible from within \cil{C}
+      \item The constructors of \cil{D} must always be rewritten, and should properly call \cil{C}'s
+      \item The constructor of a subclass should have the \cil{base} statement, which calls a (non-private) constructor of the parent class
+    }}
+  }}
+  \codeview{1}{18}{29}{\scriptsize}{\codepath{MultiCounterInheritance/Program.cs}}
+}
+
+
+\frs{8}{\Cil{protected} access level }{
+  \bl{Usable for the members of a class}{\iz{
+    \item It is an intermediate level between \cil{public} and \cil{private}
+    \item Indicates that the member (field, method, constructor, property) is accessible from the current class, from a subclass, and from subclasses of subclasses (recursively)
+  }}
+  \bl{What is it for?}{\iz{
+    \item It allows subclasses to access supra-class information that you don't want clients to see
+    \item Most often used in retrospect replacing a \cil{private}
+    \item Using \cil{protected} fields is to be avoided -- it somewhat breaks encapsulation; should better use \cil{protected} properties/methods
+  }}
+  \bl{Example class \cil{BiCounter} - bidirectional counter}{\iz{
+    \item A counter with also the \cil{Decrement} method
+    \item Impossible without making the \cil{Value} accessible also for modification
+  }}
+}
+
+\fr{\Cil{ExtendibleCounter} and \Cil{BiCounter}}{
+  \codeview{1}{5}{34}{\tiny}{\codepath{BiCounter/Program.cs}}
+}
+
+\fr{Analogous solution with fields}{
+  \codeview{1}{18}{38}{\ssmall}{\codepath{BiCounterFields/Program.cs}}
+}
+
+\frs{20}{Overriding}{
+  \bl{Extension and modification}{\iz{
+    \item When creating a new class by extension, it is very often not enough to add new functionality
+    \item Sometimes it is also necessary to modify some of those available, possibly even distorting a bit their original functioning
+    \item This can be done by rewriting in the subclass one (or more) of the methods/properties of the superclass -- called an \alert{override}
+    \item To do so, methods/properties in the base class must be declared \cil{virtual}, and those in the subclass \cil{override}
+    \item If necessary, the rewritten method can invoke the version of the parent using the special receiver \cil{base}
+    \item It is possible to ``hide'' a method in the superclass that is not \cil{virtual}, by the modifier \cil{new} -- but this mechanis is optional, and arguably with limited use
+    \item A class can be declared \cil{sealed} to prevent extension
+    
+  }}
+  \bl{Example \cil{LimitCounter}}{\iz{
+    \item Create a (sealed) counter which, having reached a certain limit, no longer continues
+    \item It is necessary to override the \cil{Increment()} method
+    \item An additional getter method inspects when the limit is reached
+  }}
+}
+
+\fr{Using the \Cil{LimitCounter} class}{
+  \codeview{1}{5}{18}{\scriptsize}{\codepath{LimitCounter/Program.cs}}
+}
+
+
+\fr{Class \Cil{LimitCounter}}{
+  \codeview{1}{20}{41}{\scriptsize}{\codepath{LimitCounter/Program.cs}}
+}
+
+\fr{A summary of access modifiers (for types and members)}{
+    \bx{Recall that \cil{internal} means ``visible only in this assembly''}
+    \bl{Who can access?}{\iz{
+        \item \cil{public}: any other code in the same assembly or another assembly that references it
+        \item \cil{private}: only by code in the same class
+        \item \cil{protected}: only by code in the same class, or in a class that is derived from that class
+        \item \cil{internal}: by any code in the same assembly, but not from another assembly
+        \item \cil{protected internal}: by any code in the assembly in which it's declared, or from within a derived class in another assembly
+        \item \cil{private protected}: only within its declaring assembly, by code in the same class or in a type that is derived from that class
+    }}
+}
+
+\fr{Class \Cil{Object}}{
+    \bl{Implicit extension of \cil{Object}}{\iz{
+        \item when a class extends nothing, it is like extending \cil{System.Object}
+        \item transitively, this means all classes inherit from \cil{Object}
+        \item it provides low-level services for all objects 
+        \item we will in the following explain some of them
+    }}
+    \bl{Method \cil{String ToString()}}{\iz{
+        \item it can be overriden to provide a canonical string representation of an object
+        \item \cil{Console.Write} uses it if you try to write an object
+    }}
+}
+
+\subsection{Runtime types}
+
+\fr{Polymorphism with \Cil{object}}{
+  \codeview{1}{5}{29}{\ssmall}{\codepath{PolyObject/Program.cs}}
+}
+
+
+\fr{\Cil{UsePerson} and \Cil{Person}}{
+  \codeview{1}{5}{34}{\tiny}{\codepath{Person/Program.cs}}
+}
+
+\fr{Specialisations of \Cil{Person}}{
+  \codeview{1}{36}{58}{\tiny}{\codepath{Person/Program.cs}}
+}
+
+\frs{5}{Static type and run-time type}{
+  \bl{A duality introduced by subtyping (inclusive polymorphism)}{\iz{
+    \item Static type: the data type of an expression that can be inferred by the compiler
+    \item Run-time type: the data type of the value (/ object) actually present (could be a subtype of the static one, and can be inspected with \cil{GetType()}){\iz{\item in this case virtual method calls rely on late-binding}}
+  }}
+  \bl{Example in \cil{PrintAll()} code, inside the \cil{foreach}}{\iz{
+    \item Static type of \cil{obj} is \cil{Object}
+    \item Run-time type of \cil{obj} varies from time to time: \cil{String}, \cil{Int32}, \dots
+  }}
+  \bl{Type inspection at run-time}{\iz{
+    \item In some cases it is necessary to inspect the type at run-time
+    \item The case of the \cil{is} and \cil{as} operators
+    \item However, using them is bad practice: it means you have poorly used polymorphism
+  }}
+}
+
+\fr{Type check and conversion}{
+  \codeview{1}{6}{32}{\tiny}{\codepath{PersonRuntime/Program.cs}}
+}
 
 
 \end{document}
