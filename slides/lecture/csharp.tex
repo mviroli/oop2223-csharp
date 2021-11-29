@@ -10,7 +10,7 @@
 \fr{Outline}{
   \bl{Parts}{\en{
     \item Basic OO concepts in C\#
-    \item The C\#/.NET framework and basic mechanisms
+    \item Some specific C\#/.NET mechanisms
     \item Encapsulation, interfaces, inheritance
     \item Generics
     \item Exceptions and some key C\# libraries
@@ -23,15 +23,47 @@
 \newcommand{\codepath}[1]{../../code/lecture-01/#1}
 
 \frs{5}{Brief introduction to C\#}{
-  \bl{C\#}{\iz{
+  \bl{C\# and .NET}{\iz{
     \item Designed by Anders Hejlsberg around 2000 at Microsoft
     \item Is part of the .NET initiative, designed to compile over the Common Language Infrastructure (CLI)
     \item Current version is 9.0, released in 2020 for .NET 5.0
     \item Mono is a free, open-source compiler and runtime environment
     \item Initially developed as very similar to Java, then somewhat diverged
+    \item Essentially, C\# took a different path than Java in following Scala
+    \item Shall in these slides refer to ``mainstream/standard OOP'' to mean the intersection of Java/C\#
     }}
-  \fg{height = 0.4\textheight}{img/NET.jpg}
 }
+
+\frs{5}{.NET}{
+  \bl{Main elements}{\iz{
+    \item .NET started as a ployglot framework since its beginning
+    \item C\# is by far the mostly used language
+    \item Concepts replicate Java and JVM: CIL/bytecode, CLR/JVM, and so on
+    \item As a key difference, .NET initially targets Microsoft Windows
+    }}
+  \fg{height = 0.4\textheight}{img/dotnet-overview.pdf}
+}
+
+
+\begin{frame}{\dotnet Platform -- Present vs. Past}
+ \bl{Past to Present}{\iz{
+        \item Before \dotnet 5 there used to be three major implementations of the \emph{class library}:
+        %
+        \begin{description}
+            \item[\dotnet Framework] | Windows-specific, full-featured, targetting desktop and web applications
+            \item[\dotnet Core] | multi-platform (Win, Mac, Linux), less-featured, targetting desktop and web applications
+            \item[Xamarin] | mobile-oriented (Android, iOS, Mac OS) 
+        \end{description}
+
+        \vfill
+
+        \item Since \dotnet 5, implementations are aligned
+    }}
+    \bl{In these slides}{
+        Stick to \alert{\dotnet Core 3.1}, to maximise interoperability and to avoid compatibility issues
+    }
+\end{frame}
+
 
 \frs{20}{Features of C\#}{
   \bl{Ingredients}{\iz{
@@ -47,8 +79,9 @@
   \fg{height = 0.4\textheight}{img/sizes.png}
 }
 
+
 \fr{C\# types: we start with Simple Types and Class Types}{
-  \fg{height = 0.6\textheight}{img/datatypes.png}
+  \fg{height = 0.6\textheight}{img/type-system.pdf}
 }
   
 \frs{20}{Variables: initialisation and inference}{
@@ -58,9 +91,40 @@
   \item Similar naming conventions for variables
   \item \texttt{null} is assignable to variables of reference types
   \item Can use \texttt{var} to declare a variable with type to be inferred
+  \item Keywords (\cil{int}, \cil{bool}, \cil{string}, \cil{object}) map to Library Value Types or Classes
   }}
-  \codeview{3}{9}{23}{\scriptsize}{\codepath{InitialExamples/Initialisation.cs}}
+  \codeview{3}{9}{24}{\scriptsize}{\codepath{InitialExamples/Initialisation.cs}}
 }
+
+\begin{frame}{\dotnet Built-in Types}\centering
+    \begin{table}[]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{c|c|c|c|c}
+            \textbf{Name}    & \textbf{Keyword} & \textbf{Category} & \textbf{Size} & \textbf{Description}  \\
+            \hline\hline
+            \texttt{Boolean} & \texttt{bool}    & \emph{val} & 1             & either \texttt{true} or \texttt{false} \\
+            \texttt{Char}    & \texttt{char}    & \emph{val} & 2             & UTF-16 characters \texttt{`U+0000'} \ldots \texttt{`U+FFFF'} \\
+            \texttt{Byte}    & \texttt{byte}    & \emph{val} & 1             & integers in $0 \ldots (2^{8}-1)$ \\
+            \texttt{SByte}   & \texttt{sbyte}   & \emph{val} & 1             & integers in $-2^{7} \ldots (2^{7}-1)$ \\
+            \texttt{Int16}   & \texttt{short}   & \emph{val} & 2             & integers in $-2^{15} \ldots (2^{15}-1)$ \\
+            \texttt{UInt16}  & \texttt{ushort}  & \emph{val} & 2             & integers in $0 \ldots (2^{16}-1)$ \\
+            \texttt{Int32}   & \texttt{int}     & \emph{val} & 4             & integers in $-2^{31} \ldots (2^{31}-1)$ \\
+            \texttt{UInt32}  & \texttt{uint}    & \emph{val} & 4             & integers in $0 \ldots (2^{32}-1)$ \\
+            \texttt{Int64}   & \texttt{long}    & \emph{val} & 8             & integers in $-2^{63} \ldots (2^{63}-1)$ \\
+            \texttt{UInt64}  & \texttt{ulong}   & \emph{val} & 8             & integers in $0 \ldots (2^{64}-1)$ \\
+            \texttt{Float}   & \texttt{float}   & \emph{val} & 4             & abs in $1.5\times 10^{-45} \ldots 3.4\times 10^{38}$ \\
+            \texttt{Double}  & \texttt{double}  & \emph{val} & 8             & abs in $5.0\times 10^{-324} \ldots 1.7\times 10^{308}$ \\
+            \texttt{Decimal} & \texttt{decimal} & \emph{val} & 16            & abs in $1.0\times 10^{-28} \ldots 7.9228 \times 10^{28}$ \\
+            \texttt{Object}  & \texttt{object}  & \emph{ref} & O(1)          & anything \\
+            \texttt{String}  & \texttt{string}  & \emph{ref} & O($n$)   & sequences of $n$ UTF-16 characters \\
+        \end{tabular}
+        }
+    \end{table}
+
+    \tiny
+    (cf. \url{https://docs.microsoft.com/dotnet/csharp/language-reference/builtin-types/built-in-types})
+\end{frame}
+
 
 \frs{5}{C\# classes}{
   \bl{The core of OOP is essentially as in Java} {\iz{
@@ -68,7 +132,6 @@
     \item Class instantiation, method invocation, field access have same syntax and semantics
     \item Static, non-static fields/methods have same syntax/semantics
     \item A source file must define the namespace (similar to Java package)
-    \item Can use \cil{string} or \cil{String} for strings -- prefer the former
     \item Syntax for calling a constructor from another constructor is different
   }}
   \bl{Formatting}{\iz{
@@ -208,6 +271,9 @@
 \fr{Playing with properties: client code}{
 \codeview{2}{7}{18}{\scriptsize}{\codepath{PersonPropertiesPlay/Program.cs}}
 }
+
+\section{Some specific C\#/.NET mechanisms}
+\renewcommand{\codepath}[1]{../../code/lecture-02/#1}
 
 
 \end{document}
