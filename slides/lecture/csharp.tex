@@ -677,5 +677,333 @@
   \codeview{1}{6}{32}{\tiny}{\codepath{PersonRuntime/Program.cs}}
 }
 
+\section{Generics}
+\renewcommand{\codepath}[1]{../../code/lecture-05/#1}
+
+\subsection{Generic classes}
+
+\fr{Uniform abstractions with classes}{
+  \bl{Uniform abstractions for recurring problems}{\iz{
+    \item During the development of various systems, recurrent problems are encountered that can find a common solution
+    \item In some cases these solutions are factorisable (by abstraction) into a single highly reusable class
+  }}
+  \bl{A fundamental case: the \alert{collection}}{\iz{
+    \item A collection is an object whose task is to store the reference to a (typically unspecified) number of other objects
+    \item Among its tasks is to allow modifications and quick access to the set of elements of this collection
+    \item Various strategies can be used, following the theory/practice of algorithms and data structures
+  }}
+}
+
+\fr{Preliminary \Cil{UseIntVector}}{
+  \codeview{1}{5}{21}{\scriptsize}{\codepath{IntVectorPre/Program.cs}}
+}
+
+\fr{Preliminary \Cil{IntVector}}{
+  \codeview{1}{23}{53}{\tiny}{\codepath{IntVectorPre/Program.cs}}
+}
+
+\frs{5}{C\# Indexers}{
+    \bl{Let's improve this design a bit}{\iz{
+        \item we have getters/setters that are parametric, namely, they depend on an indexer
+        \item we would like to handle them as we would with properties
+    }}
+   \bl{C\# Indexer}{\iz{
+        \item a sort of parametric property
+        \item it has no name 
+        \item it supports the array access notation for reading and/or writing elements
+        \item basic syntax: \cil{public <type> this[<type> <name>]\{ get\{...\} set\{...\}\}}
+        \item could have many parameters of the indexer
+        \item could have many indexers in a class, with different parameters
+    }}
+}
+
+\frs{5}{\Cil{IntVector} (with indexer)}{
+  \codeview{1}{19}{51}{\tiny}{\codepath{IntVector/Program.cs}}
+}
+
+\fr{\Cil{UseIntVector}}{
+  \codeview{1}{5}{17}{\scriptsize}{\codepath{IntVector/Program.cs}}
+  \bx{In this lesson we shall assume we never ``escape'' boundaries of arrays and collections, which would result in exceptions} 
+}
+
+\frs{5}{A first step towards uniformity}{
+  \bl{Only vectors of \cil{int}?}{\iz{
+    \item Experience would immediately lead to the need to design vectors of \cil{double}, \cil{bool}, \dots that is, of any value type
+    \item And then, also vectors of \cil{String}, \cil{DateTime}, and so on
+    \item The implementation would be similar, but without the possibility of reuse.
+  }}
+  \bl{The idea of ``monomorphic'' collections}{\iz{
+    \item A first solution to the problem is obtained by exploiting inclusive polymorphism and the ``everything is an object'' philosophy (including the use of autoboxing)
+    \item Only a \cil{ObjectVector} is created, simply by replacing \cil{int} with \cil{object}
+    \item Any element is inserted (via implicit upcast conversions)
+    \item When you get a value back you need an explicit downcast with \cil{as} operator
+    \item Working with such interfaces gets bloated, and low-level
+  }}
+}
+
+\fr{\Cil{UseObjectVector}}{
+  \codeview{1}{5}{32}{\ssmall}{\codepath{ObjectVector/Program.cs}}
+}
+
+\frs{5}{\Cil{ObjectVector}}{
+  \codeview{1}{34}{66}{\tiny}{\codepath{ObjectVector/Program.cs}}
+}
+
+\fr{Another example of collection: \Cil{ObjectList}}{
+  \codeview{1}{25}{47}{\ssmall}{\codepath{ObjectList/Program.cs}}
+}
+
+\fr{\Cil{UseObjectList}}{
+  \codeview{1}{6}{23}{\ssmall}{\codepath{ObjectList/Program.cs}}
+}
+
+\fr{The need for a parametric polymorphism approach}{
+  \bl{In C\# 1.0}{\iz{
+    \item This was the standard approach to building collections
+  }}
+  \bl{Problem}{\iz{
+    \item With this approach, C\# code resulted in many uses of objects similar to \cil{ObjectVector} or \cil{ObjectList}
+    \item It was very easy to lose track of what the content was \dots {\iz{
+      \item which objects a collection contain? only \cil{int}? only \cil{strings}?
+    }}
+    \item The code often contained bad conversions
+  }}
+  \bl{More generally}{
+    The problem arises every time I want to collect objects whose type is not known a priori, but could be subject to inclusive polymorphism
+  }
+}
+
+\frs{5}{Parametric polymorphism}{
+  \bl{Basic idea: generification}{\iz{
+    \item Given a code snippet \cil{F} that works on a certain type, say \cil{string}, if it could also work uniformly with others\dots
+    \item \dots you make it parametric by replacing \cil{string} with a sort of \cil{T} variable (called \alert{type-variable}, i.e. a variable that contains a type)
+    \item At this point, when you need the code fragment instantiated on the strings, you use \cil{F<String>}, that is, it is required that \cil{T} becomes \cil{string}
+    \item When you need the code snippet instantiated on integers, use \cil{F<int>}
+  }}
+  \bl{C\# Generics}{\iz{
+    \item Generic classes / interfaces / methods
+    \item Fully integrated in the type system and run-time (differently from other frameworks, like the JVM)
+    \item Typical application with collections
+  }}
+}
+
+\frs{5}{Generic vector}{
+  \codeview{1}{33}{65}{\tiny}{\codepath{GenericVector/Program.cs}}
+}
+
+\fr{Using generic vector}{
+  \codeview{1}{5}{31}{\ssmall}{\codepath{GenericVector/Program.cs}}
+}
+
+\subsection{Generic Methods}
+
+\fr{Generic Methods}{
+  \bl{Basic idea}{\iz{
+    \item generify a single method in the type(s) of some of its arguments/return
+    \item syntactically: add type parameter after method name
+    \item at the call side: specify type parameter after method name
+    \item at the call side: use type inference, simply avoiding any specification
+  }}
+  \bl{Two typical applications}{\iz{
+    \item generic static methods: as helpers working on generic structures
+    \item in generic classes: as a helper to mix differen instantiations
+  }}
+  \bl{Syntax is ad-hoc}{\iz{
+    \item type parameters come after method name in declarations/invocations
+    \item type parameters in invocations can be inferred
+  }}
+}
+
+\fr{Generic static methods}{
+    \codeview{1}{7}{34}{\ssmall}{\codepath{GenericMethods/Program.cs}}
+}
+
+\fr{Generic instance methods: the case of class \Cil{Pair<TA,TB>}}{
+  \codeview{1}{35}{51}{\ssmall}{\codepath{Pair/Program.cs}}
+}
+
+\fr{Using pairs}{
+  \codeview{1}{6}{33}{\ssmall}{\codepath{Pair/Program.cs}}
+}
+
+\subsection{Generic interfaces}
+
+\frs{10}{Generic interfaces}{
+  \bl{What is a generic interface}{\iz{
+    \item It is an interface that declares type-variables: \cil{interface I <T1, T2> \{.. \}}
+    \item The type-variables appear in the methods signatures defined by the interface
+    \item When a class implements it, it must instantiate the type variables (or assign them to other type-variables if it is generic)
+  }}
+  \bl{Uses}{
+    To create uniform contracts that do not have to depend on the types used
+  }
+  \bl{Example 1}{\iz{
+    \item An \cil{IGenericVector<T>} would be used to abstract over \cil{GenericVector<T>}
+  }}
+  \bl{Example 2: a new case, \alert{Iterators}}{\iz{
+    \item An iterator is an object used to access a sequence of elements
+    \item We will now look at a simplified version - different from that of the Java libraries
+  }}
+}
+
+\fr{\Cil{IGenericVector<T>}}{
+  \codeview{1}{20}{27}{\footnotesize}{\codepath{IGenericVector/Program.cs}}
+}
+
+\frs{5}{Implementing \Cil{IGenericVector}}{
+  \codeview{1}{29}{61}{\tiny}{\codepath{IGenericVector/Program.cs}}
+}
+
+\subsection{Iterators and collections}
+
+\frs{10}{The Iterator pattern}{
+    \bl{Idea}{\iz{
+        \item Assume an object represents a set of values {\iz{
+            \item a collection, a source of information, a mathematical set,\dots
+        }}
+        \item \dots how could it give a service to let clients retrieve all such values?
+        \item Iterator pattern: the object gives to requestors a so-called \alert{iterator}
+        \item An iterator is an object with a method to extract the ``next'' element of the set, to be called iteratively until there are othe objects available
+        \item various implementations possible
+    }}
+    \bl{Iterator core support in C\#}{\iz{
+        \item interface \cil{IEnumerable<T>}: the root of the collection library{\iz{
+            \item can use it  in \cil{foreach} construct
+        }}
+        \item interface \cil{IEnumerator<T>}: the actual iterator you can ask to a \cil{IEnumerable}
+        \item both interfaces are connected with the \cil{yield return} construct
+    }}
+    
+}
+
+\fr{\Cil{IEnumerator<T>}, and \Cil{Range} example}{
+  \codeview{1}{9}{19}{\ssmall}{\codepath{Enumerables/Enumerators.cs}}
+  \codeview{1}{22}{33}{\ssmall}{\codepath{Enumerables/Enumerators.cs}}
+}
+
+\fr{\Cil{RangeEnumerator} implementation}{
+  \codeview{1}{35}{64}{\tiny}{\codepath{Enumerables/Enumerators.cs}}
+}
+
+\fr{The actual enumerable: \Cil{Range}}{
+  \codeview{1}{32}{43}{\ssmall}{\codepath{Enumerables/Enumerables.cs}}
+}
+
+\fr{Using \Cil{Range} with \Cil{IEnumerator}}{
+  \codeview{1}{7}{30}{\ssmall}{\codepath{Enumerables/Enumerables.cs}}
+}
+
+\fr{\Cil{foreach} is compatile with \Cil{IEnumerable}s!}{
+  \codeview{2}{20}{35}{\ssmall}{\codepath{Enumerables/Program.cs}}
+}
+
+\frs{5}{The \Cil{yield return} construct}{
+  \codeview{1}{34}{62}{\ssmall}{\codepath{YieldReturn/Program.cs}}
+}
+
+\fr{The \Cil{yield return} construct}{
+  \codeview{1}{6}{32}{\ssmall}{\codepath{YieldReturn/Program.cs}}
+}
+
+
+\fr{Creating a vector as an \Cil{IEnumerable<T>}}{
+  \codeview{1}{23}{51}{\ssmall}{\codepath{EnumerableVector/Program.cs}}
+}
+
+\fr{Enumerating our vector}{
+  \codeview{1}{7}{21}{\ssmall}{\codepath{EnumerableVector/Program.cs}}
+}
+
+\fr{\Cil{IEnumerable<T>} and collections}{
+  \bl{The collection framework very briefly (will be explored next)}{\iz{
+    \item various implementations available for collecting data
+    \item all implement interface \cil{IEnumerable<T>}
+    \item all have standard methods \cil{Add}, indexers, and  so on
+  }}
+  \codeview{1}{6}{22}{\ssmall}{\codepath{Collections/Program.cs}}
+}
+
+\fr{An example application: \Cil{ClassManagement}}{
+  \codeview{1}{7}{35}{\tiny}{\codepath{ClassManagement/Program.cs}}
+}
+
+\frs{5}{An example application: \Cil{ClassManagement}}{
+  \codeview{1}{37}{69}{\tiny}{\codepath{ClassManagement/Program.cs}}
+}
+
+\subsection{Constrained Polymorphism}
+
+\frs{10}{Constrained Polymorphism}{
+    \bl{Consider a generic class \cil{C<T>} or method \cil{M<T>(...)}}{\iz{
+        \item what operations are we allowed to perform on elements of type \cil{T}?
+        \item we can only assume it is an \cil{object}, hence e.g. \cil{ToString}
+        \item how can we express something more?
+    }}
+    \bl{\cil{where} clauses in type parameters}{\iz{
+        \item \cil{where T : class}: used to mean that \cil{T} should be a reference type
+        \item \cil{where T : new()}: used to mean that \cil{T} must have a 0-ary constructor
+        \item \cil{where T : Lamp}: used to mean that \cil{T} must be a subtype of \cil{Lamp} class
+        \item \cil{where T : ILamp}: used to mean that \cil{T} must be a subtype of \cil{ILamp} interface
+        \item \cil{where T : U}: used to mean that \cil{T} must be a subtype of another type parameter \cil{U}
+    }}
+}
+
+\frs{5}{Examples of Constrained Polymorphism}{
+  \codeview{1}{7}{39}{\tiny}{\codepath{Constrained/Program.cs}}
+}
+
+\subsection{Variance}
+
+\fr{Deepening: on the substitutability of generics}{
+  \bl{Question: \cil{List<string>} is a subtype of \cil{List<object>}?}{
+    That is, can we think of passing a \cil{List<string>} in all contexts where a \cil{List<object>} is expected instead?
+  }
+    \bl{Answer: no!! It would seem so .. but:}{
+    what happens if in the method below we pass a \cil{List<string>}? \\
+    $\Rightarrow$ we could easily compromise the integrity of the list
+  }
+  \codeview{1}{8}{18}{\tiny}{\codepath{VarianceProblem/Program.cs}}
+}
+
+\fr{Unsafety with C\# arrays}{
+  \bl{C\# arrays are treated as covariants!}{\iz{
+    \item Arrays look a lot like a generic type
+    \item \cil{string[]} $ \sim $ \cil{List<string>}, \cil{T[]} $ \sim $ \cil{List<T>}
+    \item And so we know it wouldn't be safe to handle them with covariance
+    \item But in C\# it is exactly like this!! E.g. \cil{string[] <: object[]}
+    \item So any write to array could potentially fail .... throwing an exception
+  }}
+  \codeview{1}{7}{17}{\tiny}{\codepath{VarianceArrays/Program.cs}}
+}
+
+\frs{10}{Covariance and access operations}{
+  \bl{Covariance (\cil{C<T> <: C<S>} with \cil{T<:S}) would be admissible if:}{\iz{
+    \item The \cil{C<X>} class had no operations receiving \cil{X} objects
+    \item That is, it has only private or readonly fields and no methods with \cil{X} as argument
+  }}
+  \bl{Contravariance (\cil{C<S> <: C<T>} with \cil{T <: S}) would be admissible if:}{\iz{
+    \item The \cil{C<X>} class had no operations that produce \cil{X} objects
+    \item That is, it has only private fields and no method with return type \cil{X}
+  }}
+  \bl{In practice:}{\iz{
+    \item Most of the generic \cil{C<X>} classes have fields of type \cil{X} (composition) and getter and setter operations, and therefore their covariance and contravariance would not work
+    \item C\# allows indication of covariance or contravariance in generic interfaces for which it is safe to do so, by keywords \cil{in} and \cil{out}
+    \item this allows to nicely deal with reusability of generic methods, as will see in the collection framework
+  }}
+}
+
+\fr{An advanced example of ``variant'' modelling}{
+\codeview{1}{8}{26}{\ssmall}{\codepath{VariantVector/Program.cs}}
+}
+
+\fr{Expectation}{
+\codeview{1}{58}{72}{\tiny}{\codepath{VariantVector/Program.cs}}
+}
+
+\fr{Straightforward implementation}{
+\codeview{1}{27}{56}{\tiny}{\codepath{VariantVector/Program.cs}}
+}
+
+
 
 \end{document}
