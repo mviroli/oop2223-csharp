@@ -13,38 +13,41 @@
 \title[\lecturecode{C\#}]{Object-oriented programming in C\#}
 
 
+
 \begin{document}
 
 \AtBeginSubsection[]{
 \frame{
 \frametitle{Outline}
-\tableofcontents[currentsection,currentsubsection,hideothersubsections]
+{\scriptsize{\tableofcontents[currentsection,currentsubsection,hideothersubsections,subsectionstyle=show/shaded/hide]}}
 }
 }
 
 \frame[label=coverpage]{\titlepage}
 
-\fr{Outline}{
-  \bl{Parts}{\en{
-    \item Basic OO concepts in C\#
-    \item Some specific C\#/.NET mechanisms
-    \item Encapsulation, interfaces
-    \item Inheritance
-    \item Generics
-    \item Exceptions and some key C\# libraries
-    \item Functional programming in C\#
-    \item Other programming mechanisms
-  }}
-}
+%\fr{Outline}{
+%  \bl{Parts}{\en{
+%    \item Basic OO concepts in C\#
+%    \item Some specific C\#/.NET mechanisms
+%    \item Encapsulation, interfaces
+%    \item Inheritance
+%    \item Generics
+%    \item Exceptions and some key C\# libraries
+%    \item Functional programming in C\#
+%    \item Other programming mechanisms
+%  }}
+%}
 
 \section{Basic OO in C\#}
 \newcommand{\codepath}[1]{../../code/lecture-01/#1}
+
+\subsection{C\# and .NET}
 
 \frs{5}{Brief introduction to C\#}{
   \bl{C\# and .NET}{\iz{
     \item Designed by Anders Hejlsberg around 2000 at Microsoft
     \item Is part of the .NET initiative, designed to compile over the Common Language Infrastructure (CLI)
-    \item Current version is 9.0, released in 2020 for .NET 5.0
+    \item Current version is 10.0, released in 2021 for .NET 6.0
     \item Mono is a free, open-source compiler and runtime environment
     \item Initially developed as very similar to Java, then somewhat diverged
     \item Essentially, C\# took a different path than Java in following Scala
@@ -54,10 +57,10 @@
 
 \frs{5}{.NET}{
   \bl{Main elements}{\iz{
-    \item .NET started as a ployglot framework since its beginning
+    \item .NET started as a polyglot framework since its beginning
     \item C\# is by far the mostly used language
     \item Concepts replicate Java and JVM: CIL/bytecode, CLR/JVM, and so on
-    \item As a key difference, .NET initially targets Microsoft Windows
+    \item As a key difference, .NET initially targeted Microsoft Windows
     }}
   \fg{height = 0.4\textheight}{img/dotnet-overview.pdf}
 }
@@ -85,11 +88,11 @@
 
 \frs{20}{Features of C\#}{
   \bl{Ingredients}{\iz{
-    \item C-like language: the imperative and structured part are very similar
+    \item C-like language: the imperative and structured parts are very similar
     \item Java-like language: essentially very similar to Java, specially at the beginning
     \item Static and strong typing: types are checked at run-time, preventing ill-typed operations
     \item Object-orientation: object by references, automatic garbage collection
-    \item Functional-orientation: extension methods, generics, delegates, lambdas
+    \item Functional-orientation: generics, delegates, lambdas
     }}
   \bl{Philosophy}{\iz{
     \item aiming at high expressiveness and richness, though become a rather ``large'' language
@@ -143,6 +146,8 @@
     (cf. \url{https://docs.microsoft.com/dotnet/csharp/language-reference/builtin-types/built-in-types})
 \end{frame}
 
+\subsection{Basic OOP}
+
 
 \frs{5}{C\# classes}{
   \bl{The core of OOP is essentially as in Java} {\iz{
@@ -150,7 +155,7 @@
     \item Class instantiation, method invocation, field access have same syntax and semantics
     \item Static, non-static fields/methods have same syntax/semantics
     \item Structured programming constructs (if/while) have same syntax/semantics
-    \item A source file must define the namespace (similar to Java package)
+    \item A source file must define the namespace, similar to Java package but in a wrapping construct
     \item Syntax for calling a constructor from another constructor is different
   }}
   \bl{Formatting}{\iz{
@@ -272,6 +277,7 @@
         \item the body of \cil{get} should return a value
         \item the body of \cil{set} can use a special variable \cil{value}
         \item for both we can use expression-bodied get/set
+        \item \cil{get} or \cil{set} could be private
         \item can use expression-bodied readonly property in one line
     }}
     \bl{The special case of auto-implemented properties}{\iz{
@@ -321,7 +327,7 @@
             \item Arrays are constructed by sizes, i.e. $D_1, \ldots, D_N$ are user-provided
             %
             \begin{itemize}
-                \item so memory can be contigously allocated
+                \item so memory can be contiguously allocated
                 \item items are initialised to their default values
             \end{itemize}
 
@@ -794,7 +800,7 @@
   \codeview{1}{5}{31}{\ssmall}{\codepath{GenericVector/Program.cs}}
 }
 
-\subsection{Generic Methods}
+\subsection{Generic methods}
 
 \fr{Generic Methods}{
   \bl{Basic idea}{\iz{
@@ -930,7 +936,7 @@
   \codeview{1}{37}{69}{\tiny}{\codepath{ClassManagement/Program.cs}}
 }
 
-\subsection{Constrained Polymorphism}
+\subsection{Constrained polymorphism}
 
 \frs{10}{Constrained Polymorphism}{
     \bl{Consider a generic class \cil{C<T>} or method \cil{M<T>(...)}}{\iz{
@@ -1246,6 +1252,42 @@
     }}
 }
 
+\frs{10}{Consider a \Cil{BankAccount}}{
+  \bl{With methods for:}{\iz{
+    \item withdrawing
+    \item checking balance
+  }}
+  \bl{Abstracting a \cil{IFeeCalculator}}{\iz{
+    \item the hypothesis that withdrawal fee is $1$ appears weak
+    \item surely this has to be generalise
+    \item it could vary across different accounts
+    \item it could vary dependning on the actual amount
+    \item could introduce an interface \cil{IFeeCalculator}
+  }}
+  \bl{Abstracting a \cil{IWithdrawalAction}}{\iz{
+    \item what should we do if withdrawal fail?
+    \item surely that task is better left to a different class
+    \item in this case, perhaps many different behaviour have to be defined
+    \item shuold abstract from that specific behaviour
+    \item could introduce an interface \cil{IWithdrawalAction}
+  }}
+  
+}
+
+
+\fr{Interfaces}{
+  \codeview{1}{14}{44}{\tiny}{\codepath{BankAccountStrategies/Program.cs}}
+}
+
+\fr{\Cil{FlexibleBankAccount}}{
+  \codeview{1}{46}{75}{\tiny}{\codepath{BankAccountStrategies/Program.cs}}
+}
+
+\fr{\Cil{UseFlexibleBankAccount}}{
+  \codeview{1}{77}{98}{\tiny}{\codepath{BankAccountStrategies/Program.cs}}
+}
+
+
 \frs{10}{C\# delegates}{
     \bl{Delegate}{\iz{
         \item a delegate is a wrapper for a method (reference) of a specific type (input/output arguments)
@@ -1363,7 +1405,6 @@
 \fr{The used \Cil{Person} class}{
   \codeview{1}{7}{26}{\tiny}{\codepath{LINQExample/Program.cs}}
 }
-
 
 
 \end{document}

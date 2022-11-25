@@ -1,0 +1,9 @@
+Correctly printed!
+Correctly printed!
+...
+Correctly printed!
+Communication with printer failed
+Unhandled exception. System.InvalidOperationException: The printer is currently busy
+at HandlingResources.Printer.Reserve() in /path/to/HandlingResources/Program.cs:line 16
+at HandlingResources.Program.Wrong() in /path/to/HandlingResources/Program.cs:line 42
+at HandlingResources.Program.Main(String[] args) in /path/to/HandlingResources/Program.cs:line 76

@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonRuntime", "PersonRunt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Person", "Person\Person.csproj", "{B2FBD75E-88C4-47F7-9ECD-1A1987A962B9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aula", "Aula\Aula.csproj", "{96DE2B6E-3D13-4D01-9D22-615591FA761C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,5 +62,9 @@ Global
 		{B2FBD75E-88C4-47F7-9ECD-1A1987A962B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2FBD75E-88C4-47F7-9ECD-1A1987A962B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2FBD75E-88C4-47F7-9ECD-1A1987A962B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96DE2B6E-3D13-4D01-9D22-615591FA761C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96DE2B6E-3D13-4D01-9D22-615591FA761C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96DE2B6E-3D13-4D01-9D22-615591FA761C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96DE2B6E-3D13-4D01-9D22-615591FA761C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

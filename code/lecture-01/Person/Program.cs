@@ -9,8 +9,8 @@ namespace Person
          var p1 = new Person("John", 1980);
          var p2 = new Person("Michael", 1973);
          p2.GotMarried();
-         Console.WriteLine(p1.ShowAsString()); // John 1980 False
-         Console.WriteLine(p2.ShowAsString()); // Michael 1973 True
+       //  Console.WriteLine(p1.ShowAsString()); // John 1980 False
+       //  Console.WriteLine(p2.ShowAsString()); // Michael 1973 True
       }
    }
    public class Person

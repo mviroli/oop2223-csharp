@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Point3D", "Point3D\Point3D.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InitialExamples", "InitialExamples\InitialExamples.csproj", "{4E26EFE4-CDE6-4486-99C2-7E941DBD75DE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aula", "Aula\Aula.csproj", "{84B25D40-0B9C-40A3-9A98-90CCDB41BBFC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,5 +68,9 @@ Global
 		{4E26EFE4-CDE6-4486-99C2-7E941DBD75DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E26EFE4-CDE6-4486-99C2-7E941DBD75DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E26EFE4-CDE6-4486-99C2-7E941DBD75DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84B25D40-0B9C-40A3-9A98-90CCDB41BBFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84B25D40-0B9C-40A3-9A98-90CCDB41BBFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84B25D40-0B9C-40A3-9A98-90CCDB41BBFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84B25D40-0B9C-40A3-9A98-90CCDB41BBFC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

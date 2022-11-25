@@ -1,0 +1,8 @@
+Unhandled exception. System.Exception: 5
+   at Snippets.ThrowingExceptions.Recursive(Int32 x) in /path/to/ThrowingExceptions.cs:line 37
+   at Snippets.ThrowingExceptions.Recursive(Int32 x) in /path/to/ThrowingExceptions.cs:line 30
+   at Snippets.ThrowingExceptions.Recursive(Int32 x) in /path/to/ThrowingExceptions.cs:line 30
+   at Snippets.ThrowingExceptions.Recursive(Int32 x) in /path/to/ThrowingExceptions.cs:line 30
+   at Snippets.ThrowingExceptions.Recursive(Int32 x) in /path/to/ThrowingExceptions.cs:line 30
+   at Snippets.ThrowingExceptions.Example4(String[] args) in /path/to/ThrowingExceptions.cs:line 41
+   at Snippets.Program.Main(String[] args) in /path/to/Program.cs:line 12

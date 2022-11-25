@@ -1,0 +1,654 @@
+\documentclass[presentation]{beamer}
+\usepackage{common}
+
+\title[\lecturecode{03}]{03 \\ Dependency: \\ Composition, Encapsulation, and Interfaces}
+
+\author[Mirko Viroli]{Mirko Viroli}
+\institute[]{\texttt{mirko.viroli@unibo.it}}
+
+\begin{document}
+
+\frame[label=coverpage]{\titlepage}
+\newcommand{\codepath}[1]{../../code/lecture-03/#1}
+
+\fr {Outline} {
+  \bl {Goal of the lesson} {\iz {
+  \item Describe key concepts of OOP and programming in general:\\ encapsulation, information hiding, composition, reuse, substitutability, abstraction
+  }}
+  \bl {Technical topics} {\iz {
+  \item the \cil{interface} construct
+  \item substitutability (a.k.a subtyping, a.k.a. inclusive polymorphism)  
+  }}
+}
+
+\section{Decomposition, encapsulation, information hiding}
+
+\fr{The principle of decomposition}{
+\bx{\Huge divide et impera}
+\bl{Divide and conquer: \alert{top-down} approach}{\iz{
+  \item The solution of a complex problem occurs by dividing it into simpler, independent problems
+  \item Subdivision is often multi-level
+}}
+\bl{Example}{\iz{
+\item Smart home controller: GUI, event management, algorithms to manage devices
+\item Management software: People management, Tasks management, GUI, Interaction with DB
+}}
+}
+
+\fr{Decomposition, modularity and dependencies}{
+  \bl{A crucial point of decomposition is ``modularity''}{\iz{
+    \item The division must be done in such a way that it is actually convenient
+    \item The simpler ``subproblems'' need to be isolated
+    \item This is possible if we minimize the ``dependencies'' between the subproblems, which allows:
+   {\iz{
+      \item more decision-making autonomy
+      \item less interaction with others
+      \item \alert{less negative influences in case of changes}
+    }}
+  }}
+}
+
+\fr{Modularity: which situation is preferable?}{
+\begin{center} \includegraphics[height=0.6\textheight]{img/coupling.png} \end{center}
+}
+
+\frs{10}{Decomposition and OO programming}{
+  \bl{In OO programming, we have several levels of decomposition}{\en{
+    \item Subdivision into projects (of the entire program)
+    \item Subdivision into namespaces (of the entire project)
+    \item Subdivision into classes (of a namespace)
+    \item Subdivision into methods (of a class)
+  }}
+  \bl{The crucial point to be addressed now is the division into classes}{\iz{
+    \item You must divide your code into classes as appropriate
+    \item Creating the best link with the problem space
+    \item \alert{Reducing dependencies between classes as much as possible}
+  }}
+  \bl{Technique}{\iz{
+    \item There are well-established efficient programming techniques that solve this problem, which we will begin to explore in this lesson - getting it right takes some time and experience!
+  }}
+}
+
+\fr{Dependencies and OO}{
+  \bl{Dependence}{
+    A class \cil{A}  is said to depend on a class \cil{B}  if within the code of \cil{A} the class \cil{B}, or some of its members, are mentioned or used. The dependency is deeper if many constructors/fields/methods/properties defined in \cil{B} are used in \cil{A}.
+  }
+  \bl{Implication}{
+    Each dependency strongly constrains the possibility of making changes, because it involves others to be made in cascade. If \cil{A} depends on \cil{B} and I modify \cil{B}, I will probably have to modify \cil{A} as well.
+  }
+  \bl{The ``untouchability'' syndrome --- rigid SW}{
+    When building complex software with too many unneeded dependencies, you get to the point that every single change would require many more, and therefore they become too expensive - as a result, you end up refusing change at all!
+  }
+}
+
+\frs{5}{Encapsulation}{
+  \bl{Two crucial ingredients of OO programming}{\en{
+    \item Packing data + functions to manipulate it
+    \item Information hiding via careful access control
+  }}
+  \bl{Philosophy}{\iz{
+    \item Each class declares \cil{public} only those (few) methods/properties/constructors necessary to interact with (or create) its instances
+    \item The rest (which therefore includes mere implementation aspects) is \cil{private}{\iz{
+      \item methods/constructors/properties for internal use only
+      \item{\bf{all}} fields (i.e. internal status)
+    }}
+  }}
+  \bl{Encapsulation and dependencies}{In this way the ``client'' is weakly influenced by possible future modifications concerning mere implementation aspects.
+  }
+}
+
+\frs{5}{A basic case: class \Cil{Counter}}{
+    \codeview{1}{18}{40}{\scriptsize}{\codepath{Counter/Program.cs}}
+}
+
+\fr{A basic case: usage of class \Cil{Counter}}{
+    \codeview{1}{5}{16}{\scriptsize}{\codepath{Counter/Program.cs}}
+}
+
+\frs{5}{Counter usage} {
+  \bl{The \cil{Counter} class} {\iz{
+   \item Encapsulates simple counting functionality
+   \item Gives a more abstract and modular approach than using directly an \cil{int}
+   \item Allows you to act on the count only with \cil{GetValue()} and \cil{Increment()}
+   \item [$\Rightarrow$] it is impossible to change the counter at will (or by mistake), for example by decreasing instead of increasing, or by zeroing
+  }}
+   \codeview{2}{60}{73}{\scriptsize}{\codepath{Counter/Program.cs}}
+}
+
+
+\frs{5}{Counter usage -- using \Cil{foreach} construct} {
+  \bl{\cil{foreach} construct} {\iz{
+   \item a higher-level version of standard \cil{for}
+   \item usable to iterate arrays from left to right (will show it has other applications)
+   \item to be used when there's no need to track index
+   \item syntax: \cil{foreach (<type> <var> in <array>)\{...\}}
+  }}
+   \codeview{2}{44}{55}{\scriptsize}{\codepath{Counter/Program.cs}}
+}
+
+\frs{10}{Counter usage, and evolvability} {
+  \bl{An evolution scenario for \cil{Counter}} {\iz{
+   \item Case: Assume want to change counting of elements: up to a certain limit counting should stop
+   \item The below solution is still valid, by just changing the internal implementation of class \cil{Counter}
+   \item Note it is crucial that the client uses \cil{Increment} instead of making \cil{\_countValue} public
+  }}
+   \codeview{2}{44}{55}{\scriptsize}{\codepath{Counter/Program.cs}}
+}
+
+
+\fr{Reflection: encapsulation and contract}{
+  \bl{Contract}{\iz{
+    \item The contract of an object corresponds to its usage scenarios
+    \item And therefore to the expectations that a customer has when using the object
+    \item Thanks to encapsulation, it is possible to strongly constrain these contracts, better controlling the behavior of objects
+  }}
+  \bl{The case of the Counter}{\iz{
+    \item The value of the count at the time of construction is \cil{0}
+    \item The count value at any other time is equal to the number of calls to \cil{Increment()}
+  }}
+  \bl{Observation}{
+    It is thanks to this idea that it is easier to compose objects in more complex systems
+  }
+}
+
+\fr{Encapsulation is preserved by properties!}{
+    \codeview{1}{5}{25}{\ssmall}{\codepath{CounterProperties/Program.cs}}
+}
+
+\fr{A transparent modification to the \Cil{Counter} implementation}{
+    \codeview{1}{28}{47}{\ssmall}{\codepath{CounterProperties/Program.cs}}
+}
+
+\fr{A final bit on properties: object initializers}{
+    \codeview{1}{5}{32}{\ssmall}{\codepath{ObjectInitializer/Program.cs}}
+}
+
+\fr{Properties vs methods vs fields: recap}{
+    \bl{``Properties are just methods''}{\iz{
+        \item a read-only property is essentially a Getter
+        \item a read-write property is essentially a pair of Getter and Setter method
+        \item most discussions in the following focus on methods, and applicability to properties naturally derive
+    }}
+    \bl{``Properties define a nice abstraction''}{\iz{
+        \item from the design viewpoint, public properties are much nicer than Getters/Setters, which are still the OOP standard
+    }}
+    \bl{``Properties can replace fields''}{\iz{
+        \item as an implementation mechanism, auto-implemented properties are a good replacement for fields
+        \item but this is just matter of internal implementation
+    }}
+}
+
+\section{A methodology based on encapsulation}
+
+\fr{Another example: class \Cil{Lamp}}{
+  \bl{Problem analysis}{
+    In a smart home automation system, we will have to manage a certain number of lamps (to be switched on/off and controlled via a special centralised application, e.g., via a smartphone). These are push-button commands with intensity control (10 levels). The controller must be able to access the state of each lamp (on/off, intensity level) and modify it as desired. At the first start, the lamps are off and the intensity control is at zero (in a range of $[0,1]$).
+  }
+  \bx{How do we build the \cil{Lamp} class?}
+}
+
+\fr{Design and implementation: phases}{
+  \bl{Modern steps in building a class}{\en{
+    \item Design of the public part of the class
+    \item Definition of a test for the class
+    \item Definition of the state 
+    \item Implementation completion
+    \item Test the result
+    \item Final code improvement
+  }}
+}
+
+\fr{Phase 1: Design of the public part of the class}{
+  \bx{That is, the name of the class and the signatures of public operations (methods and constructors)}
+  \bl{Guidelines}{\iz{
+    \item Consider all the various use cases of an object of the class
+    \item Insert constructors and public methods only for necessary operations
+    \item Where possible, avoid entering a large number of such operations
+  }}
+  \bl{The \cil{Lamp} case}{\iz{
+    \item A unique constructor with no arguments
+    \item Methods for turning on / off
+    \item Methods for increasing / decreasing / setting intensity
+    \item Methods for accessing the state of the lamp
+  }}
+  
+}
+
+\fr{Public part -- a skeleton}{
+    \codeview{1}{24}{39}{\footnotesize}{\codepath{LampInterface/Program.cs}}
+}
+
+\fr{Phase 2: Definition of a test}{
+\bx{That is, expectations}
+  \bl{In general}{\iz{
+    \item this amount to the general problem of testing prior to coding
+    \item we will in the future study in detail the test-driven approach
+    \item specific technologies and methods will be used for testing
+  }}
+  \bl{In our specific case for the \cil{Lamp} case}{\iz{
+    \item we consider a main program calling some methods on a lamp object
+    \item it is not a deep test, but, properly expanded, could be a good starting point
+  }}
+}
+
+\fr{Test code}{
+    \codeview{2}{8}{21}{\footnotesize}{\codepath{LampInterface/Program.cs}}
+}
+
+\frs{5}{Phase 3: Definition of the state}{
+  \bx{That is, private fields of the class}
+  \bl{Guidelines}{\iz{
+    \item Consider that there are various possible choices (it is an implementation aspect, which can be retracted later)
+    \item The set of fields must be as small as possible, due to performance (memory space) and non-duplication needs
+    \item The set of fields must be sufficient to keep track of all the ways in which the behavior of the object can change in the face of messages received
+  }}
+  \bl{The \cil{Lamp} case}{\iz{
+    \item We will need to know if it is on or off (\cil{bool \_on})
+    \item We will need to know the current intensity level (\cil{double \_intensity})
+    \item No more information seems to be needed, at this point... we'll see later
+  }}
+}
+
+
+\fr{Phase 4: Implementation completion}{
+\bx{That is, the body of constructors and methods}
+  \bl{Guidelines}{\iz{
+    \item Realise the body of each constructor and method in a way compatible with the contract provided for the class
+    \item Accept that the first version produced will not necessarily be the final version
+  }}
+  \bl{The \cil{Lamp} case}{\iz{
+    \item \cil{On()}, \cil{Off()} are simple Setters-like methods
+    \item \cil{IsOn()}, \cil{GetIntensity()} are simple Getters-like methods
+    \item \cil{Dim()} and \cil{Brigthen()} modify the \cil{\_intensity} field (if in range!)
+  }}
+}
+
+\fr{First Lamp Class version}{
+  \codeview{1}{23}{50}{\tiny}{\codepath{LampFirst/Program.cs}}
+}
+
+\fr{Phase 5: Final code improvement}{
+  \bl{Guidelines}{\iz{
+    \item Insert comments into the code only if needed
+    \item Verify the need for constants to avoid ``magic'' numbers
+    \item Eventually factor sub-functions into public/private methods/constructors, to avoid duplication
+    \item Possibly consider using public properties as well
+  }}
+  \bl{Specifically in this case}{\iz{
+    \item There are magic numbers, use constants!
+    \item The constructor is the default one
+    \item Better manage the $0..1$ limit
+    \item Avoid intermediate levels ($0.145$) of brightness
+    \item Retract the type choice of the \cil{\_intensity} field -- it is better to have internally an \cil{int} between $0$ and $10$!!
+  }}
+}
+
+\fr{Final Lamp Class version}{
+  \codeview{1}{23}{49}{\tiny}{\codepath{Lamp/Program.cs}}
+}
+
+\section{Composition and reuse}
+
+\frs{20}{Intro}{
+  \bx{
+    Encapsulation provides us with the mechanisms to well design classes, limiting dependencies with clients as much as possible, and therefore in such a way as to reduce the impact of the changes that become gradually necessary. \iz{
+    \item [$ \Rightarrow $] but dependency between classes is not completely avoidable, indeed, it is a prerequisite for making a group of classes a system! Moreover, dependency is also a manifestation of actual ``reuse''.
+  }}
+  \bl{Forms of dependence and reuse between classes in OO}{\iz{
+    \item Association | One object uses another: ``uses''
+    \item Composition | One object is formed by others: ``has-a''
+    \item Specialization | One class specializes another: ``is-a''
+  }}
+  \bl{Seconday Forms of dependence, special cases of composition}{\iz{
+    \item Aggregation | One object is formed by others which are stand-alone
+    \item Delegation | One object is formed by others to which many services are delegated to
+  }}
+  \bl{In the current lesson}{
+    We will introduce composition and association (composition is a stronger version of association), showing relationship to C\# \alert{interfaces}
+  }
+}
+
+\fr{Composition - ``has-a'' relation}{
+  \bl{Idea}{\iz{
+    \item an object of the class \cil{A} is obtained by composing a set of other objects, of the classes \cil{B1}, \cil{B2}, .., \cil{Bn}
+    \item an object of \cil{A} is said to contain, or consist of, objects of the classes \cil{B1}, \cil{B2}, .., \cil{Bn}
+    \item that is, the object state of \cil{A} includes information about the state of an object of \cil{B1}, one of \cil{B2}, .., one of \cil{Bn}
+    \item note that we speak properly of composition when \cil{B1}, \cil{B2}, .. \cil{Bn} are not value types, but classes
+  }}
+}
+
+\fr{Some examples of composition}{
+  \bl{GUI}{
+    A graphical interface object is made up of objects of type \cil{Button}, \cil{TextField}, \cil{Label}, etc.
+  }
+  \bl{Smart Home Controller}{
+    A home automation controller object is made up of objects of type \cil{Lamp}, \cil{TV}, \cil{Radio}, etc.
+  }
+}
+
+\frs{5}{Typical implementation in OOP}{
+  \bl{An \cil{A} object is made up of exactly one \cil{B} object}{\iz{
+    \item The \cil{A} class will have a (private) field of type \cil{B}
+    \item This field (set by the \cil{A} constructor) is always present
+  }}
+  \bl{An \cil{A} object is optionally composed of an object of \cil{B}}{\iz{
+    \item The \cil{A} class will have a (private) field of type \cil{B}
+    \item Its contents may be \cil{null} (object of \cil{B} absent)
+  }}
+  \bl{An \cil{A} object is made up of a known number $ n $ of objects from \cil{B}}{\iz{
+    \item The \cil{A} class will have $ n $ (private) fields of type \cil{B} -- especially if ``n'' is small
+  }}
+  \bl{An \cil{A} object is made up of an unknown multitude of \cil{B}}{\iz{
+    \item The \cil{A} class will have a (private) field of type \cil{B[]} (or other collection)
+  }}
+  \bx{Orthogonally, fields could be defined and/or be accessible via properties}
+}
+
+\fr{An exercise: device \Cil{TwoLampsDevice}}{
+   \bl{Characteristics of the system to be modelled}{\iz{
+     \item a base on which two lamps are installed
+     \item with commands/buttons to switch both on / off
+     \item with a command to use in ``eco'' mode
+   }}
+   \bl{Design idea 1:}{\iz{
+     \item a class with 4 fields, i.e. the two intensities and the two flags
+     \item would be a good design?
+     \item would I reuse code? would I be adhering to the DRY principle? \\(Don't Repeat Yourself)
+   }}
+   \bl{Design idea 2:}{\iz{
+     \item Reuse \cil{Lamp} and exploit the composition mechanism
+   }}
+}
+
+
+\fr{Example: \Cil{UseTwoLampsDevice}}{
+   \codeview{2}{8}{20}{\scriptsize}{\codepath{TwoLampsDevice/Program.cs}}
+}
+
+\frs{5}{Example: \Cil{TwoLampsDevice}}{
+   \codeview{1}{23}{55}{\tiny}{\codepath{TwoLampsDevice/Program.cs}}
+}
+
+
+\fr{The need for a graphical notation - UML}{
+  \bl{UML - Unified Modeling Language}{\iz{
+    \item It is a graphical and OO-based language for modeling software
+    \item It facilitates the exchange of documentation, and the reasoning on articulated and complex systems
+    \item It has been an OMG standard since 1996
+    \item It is also very useful for educational purposes
+    \item We will only start using the part called \alert{Class Diagram}
+    \item UML is language independent! 
+    \item It does not capture all C\# constructs
+  }}
+  \bl{UML can capture different abstractions}{\iz{
+    \item it essentially documents a design, hence you can freely decide what to show and what not, depending on the information you want to convey
+  }}
+}
+
+\frs{5}{Class Diagram}{
+  \bl{.. class diagram, a first description}{\iz{
+    \item One rectangular box per class, divided into three areas:{\iz{
+      \item 1. class name, 2. fields, 3. methods (and constructors)
+    }}
+    \item On fields and methods{\iz{
+      \item is prefixed with \cil{-} if private, \cil{+} if public
+      \item are underlined if \cil{static}
+      \item of  methods only the signature is reported, with syntax: \cil{name (arg1: type1, arg2: type2, ..): return_type}
+      }}
+    \item What about a property? Non-standard treatment. Either: {\iz{
+        \item it can be rendered as a Getter or Getter/Setter pair, or
+        \item it can be rendered as field
+        \item can possibly add stereotypes \cil{<<property>>}/\cil{<<get>>}/\cil{<<set>>}
+    }}
+    \item arcs between classes indicate special relations:{\iz{
+      \item with rhombus (composition), with arrow (simple association)
+      \item with triangle (generalization)
+      \item the arc can be labeled with the multiplicity (1, 2, 0..1, 0..n, 1..n)
+    }}
+  }}
+}
+
+\fr{Full UML notation for the \Cil{Lamp} class: \\typically used in implementation}{
+  \fg{height = 0.8 \textheight}{img/lamp1.pdf}
+}
+
+\fr{Partial notation, public part only: \\typically used in the design phase}{
+  \fg{height = 0.6 \textheight}{img/lamp2.pdf}
+}
+
+\fr{UML: \Cil{Lamp} and \Cil{TwoLampsDevice}}{
+  \fg{height = 0.5 \textheight}{img/twolamps.pdf}
+}
+
+\fr{A new design: \Cil{LampsRow}}{
+  \fg{height = 0.4 \textheight}{img/lampsrow.pdf}
+}
+
+\fr{\Cil{UseLampsRow}}{
+   \codeview{2}{8}{22}{\scriptsize}{\codepath{LampsRow/Program.cs}}
+}
+
+\fr{Example: \Cil{TwoLampsDevice}}{
+   \codeview{1}{25}{47}{\tiny}{\codepath{LampsRow/Program.cs}}
+}
+
+
+\fr{Scenario \Cil{SmartHome}}{
+   \fg{height = 0.65 \textheight}{img/pre-home.pdf}
+   \bx{How would you write the \cil{SwitchAll} method in a reusable way, and possibly to be open to late introduction of new types of devices?}
+}
+
+\fr{Implementation without reuse: schema}{
+   \codeviewall{\ssmall}{code/SmartHomeTry.cs}
+} 
+
+\section{Interfaces}
+
+\frs{15}{Motivations}{
+  \bl{Specification}{\iz{
+    \item We need a mechanism to explicitly separate in different declarations, the interface of the class and its implementation
+    \item This allows you to keep the ``contract'' part (typically fixed) from the ``implementation'' part (which can be changed frequently).
+    \item This allows you to break dependency across implementations, since client code can refer to the contract, not the implementation
+    \item Key software engineering principle: ``Depend on abstractions, not on implementations!''
+  }}
+  \bl{Polymorphism/substitutability}{\iz{
+    \item Interfaces will allow to provide different possible implementations of a contract
+    \item All usable in a homogeneous way, and hence interchangeable on need, supporting smooth software evolution
+    \item In the case of \cil{SmartHome}:{\iz{
+        \item Having a single contract for ``devices'', and ..
+        \item .. several classes that respect it
+        \item \cil{SmartHome} will manage a single array of ``devices''
+
+    }}
+  }}
+}
+
+\frs{10}{C\# \Cil{interfaces}}{
+  \bl{What is an \cil{interface}}{\iz{
+    \item It is a new declarable \alert{reference type} (like classes)
+    \item It has a name, and includes a set of method signatures (and properties)
+    \item It cannot be used to create objects the \cil{new} operator
+  }}
+  \bl{An \cil{interface} \cil{I} can be ``implemented'' by a class}{\iz{
+    \item Through a class \cil{C} that explicitly declares it (\cil{class C : I \{.. \}})
+    \item \cil{C} will define (the body of) all methods declared in \cil{I}
+    \item An instance object of \cil{C}, will have the usual \cil{C} type, but also \cil{I}
+    \item namely, type \cil{C} is a subtype of \cil{I}
+    \item C\# convention for interface names: \cil{IDevice}, \cil{IPerson}, \dots
+  }}
+  \bl{Example: SmartHome devices}{
+    \cil{Lamp}, \cil{TV}, \cil{Radio}, \cil{AirConditioner} have one common feature, they are devices and as such they can at least be switched on or off. It is possible to define a \cil{IDevice} interface that all 4 implement.
+  }
+}
+
+\fr{Interface \Cil{IDevice}}{
+\bx{\cil{IDevice} introduce a contract for devices: they provide services to be switched on, switched off, and to check if they are on.}
+\codeview{1}{5}{12}{\small}{\codepath{SmartHome/Program.cs}}
+}
+
+\frs{5}{Two lamp implementations of \Cil{Device}}{
+  \codeview{1}{14}{38}{\ssmall}{\codepath{SmartHome/Program.cs}}
+  \vspace{-10pt}\bx{Then, ideally one implements \cil{TV}, \cil{Radio}, \dots}
+}
+
+\fr{UML notation for interfaces}{
+   \bx{\iz{
+     \item interface as box with title ``\cil{<<interface>> Name}''
+     \item dashed arc (triangle end) for the relation: ``\cil{implements}''
+     \item arches grouped to improve the graphic rendering
+   }}
+   \fg{width = 0.7 \textwidth}{img/uml-int.pdf}
+}
+
+\fr{Interfaces as reference types}{
+   \bl{Given the \cil{I} interface, in what sense is \cil{I} a type?}{\iz{
+     \item \cil{I} is a type like any other (\cil{int}, \cil{float}, \cil{String}, \cil{Lamp}, \cil{Lamp[]})
+     \item it is usable to declare variables, as the input / output type of a function, as the type of a field, and so on
+   }}
+   \bl{What are the objects that belong to that type?}{
+     the objects of the classes that declare to implement that interface
+   }
+   \bl{What operations are allowed?}{
+     exactly (and only) those of the members (methods and properties) defined by the interface
+   }
+}
+
+\fr{Interfaces, assignments, and reusability}{
+  \codeview{1}{58}{81}{\ssmall}{\codepath{SmartHome/Program.cs}}
+}
+
+
+\frs{12}{Rationale for interfaces}{
+   \bl{When to add an interface to a class?}{\iz{
+     \item when it is considered useful to separate contract from implementation (always true for key concepts in complex applications)
+     \item when it is expected that various classes may want to implement the same contract
+     \item when you want to build features that can work with \alert{any} object that implements the contract \iz{
+     \item special case: When you want to compose (``has-a'') any object that implements the contract}
+     \item will show interface support key design patterns
+     \item [$\Rightarrow$] experience shows that reusable classes usually always have their own \cil{interface}
+   }}
+   \bl{So:}{\iz{
+     \item where an object that implements the contract is expected, the interface type is used
+     \item this allows the reuse of the functionality to all classes that implement the contract
+   }}
+} 
+
+\fr{\Cil{SmartHome} revisited}{
+  \fg{height=0.65\textheight}{img/uml-int-domus.pdf}
+}
+
+\fr{\Cil{SmartHome} revisited}{
+  \codeview{1}{83}{112}{\tiny}{\codepath{SmartHome/Program.cs}}
+}
+
+\section{Types, subtypes, substitutability, polymorphism}
+
+\fr{Interface implementation as a ``subtype'' relation}{
+  \bl{A type can be considered as a set of values / objects}{
+    \iz{
+      \item $T_{\texttt{bool}} = \{\texttt{true}, \texttt{false} \} $
+      \item $T_{\texttt{int}} = \{- 2147483648, \ldots, -1,0,1,2, \ldots, 2147483647 \} $
+      \item $T_{\texttt{Lamp}} = \{$all objects of class \cil{Lamp} $\} $
+      \item $T_{\texttt{IDevice}} = \{$all objects of classes that implement \cil{IDevice} $\} $
+      \item $T_{\texttt{String}} = \{$all objects of class \cil{String} $\} $
+  }}
+  \bl{\cil{Lamp} is a subtype of \cil{IDevice}, namely, a subset}{\iz{
+    \item An object of the \cil{Lamp} class is also of the type \cil{IDevice}
+    \item So, in an object belongs to $\texttt{Lamp}$ it also belongs to $\texttt{IDevice}$
+    \item That is, $T_{\texttt{Lamp}} \subseteq T_{\texttt{IDevice}}$, also spelled: \texttt{Lamp <:\!\!\! IDevice}
+  }}
+  \bx{\Large Each class is a subtype of the interfaces it implements!}
+}
+
+\frs{5}{Subtypes and principle of substitutability}{
+  \bl{Liskov substitutability principle (1993)}{
+    If \texttt{A} is a subtype of \texttt{B} then any object (or value) of \texttt{A} must be usable where a program expects an object (or value) of \texttt{B}
+  }
+  \bl{In the case of interfaces}{\iz{
+    \item The compiler already ensures that if the class \texttt{C} implements the interface \texttt{I}, then any instance of \texttt{C} can be passed where the program expects an element of the type \texttt{I}.
+    \item[$\Rightarrow$] Hence there won't be errors: the program can manipulate elements of the type \texttt{I} only by sending them the messages declared in \texttt{I}, which are surely ``accepted'' by the objects of \cil{}---the converse is not true.
+    \item The designer has additionally to ensure that the various implementations are semantically compatible and hence interchangeable.
+   }}
+   \bx{\Large Note: \texttt{I} is more general than \Cil{C}, but provides less functionality!}
+}
+
+
+\fr{Polymorphism}{
+  \bl{Polymorphism = many forms (many types)}{There are different approaches to polymorphism in OO languages \iz{
+    \item Inclusive polymorphism: subtyping
+    \item Parametric polymorphism: genericity
+    \item Ad-hoc polymorhism: type-classes (an advanced mechanism, not supported in C\#)
+  }}
+  \bl{Inclusive polymorphism}{It is precisely the application of the principle of substitutability \iz{
+    \item If the type \cil{A} is a specialization of \cil{B}
+    \item ..you can use an object of type \cil{A} where one of \cil{B} is expected
+  }}
+}
+
+\frs{15}{Polymorphism and interfaces}{
+  \bl{Rigid, wrong approach}{\iz{
+    \item an object of class \cil{C} must use an object of another class
+    \item we ``hard-code'' the fact that such other class is a certain \cil{D}
+    \item this approach makes the program rigid and with an unneeded dependency
+  }}
+  \bl{Flexible approach: a cornerstone of OOP}{\iz{
+    \item the \cil{I} interface captures the contract of \cil{C1} (and possible variants)
+    \item various classes \cil{C1}, \cil{C2}, \cil{C3} (and others in the future) implement \cil{I}
+    \item \cil{C} has no dependencies on \cil{C1}, \cil{C2}, \cil{C3}
+    %\item (the use could be a composition, as in the previous case)
+  }}
+  \fg{height = 0.4 \textheight}{img/uml-int-general.pdf}
+}
+
+
+
+\fr{Late binding (or dynamic binding)}{
+  \bl{Delayed connection}{Occurs with calls to methods via interfaces \iz{
+    \item Consider the code of method \cil{SwitchOnAndOff()} in previous slides
+    \item We send to the argument \cil{d} messages (\cil{SwitchOn} and \cil{SwitchOff}), but the actual code to execute is chosen dynamically (i.e. ``late''), depending on the class of the object one actually pass to the invocation (\cil{Lamp}, \cil{TV}, ..)
+    \item Terminology: \cil{d} in such method has type \cil{IDevice} (static type), but at runtime it is a \cil{Lamp} (run-time type)
+  }}
+}
+
+\section{Other Interface Mechanisms}
+
+\frs{5}{Other aspects of interfaces}{
+  \bl{Conceptually}{\iz{
+    \item Only instance methods and properties (will see also events / indexers)
+    \item No static members
+    \item No fields, hence also no auto-implemented properties
+    \item No constructor
+  }}
+  \bx{\Large Essentially, an \Cil{interfaces} only include method headers!}
+  \bl{Practically, in recent C\# versions}{\iz{
+    \item Instance methods and properties (will see also events / indexers)
+    \item Static field, methods and properties
+    \item Default implementation of methods
+    \item No instance fields, hence also no auto-implemented properties
+    \item No constructor
+  }}
+}
+
+\frs{5}{Multiple implementation}{
+  \bl{Multiple implementation}{Possible declaration: \cil{class C : I1, I2, I3 \{.. \}}
+  \iz{
+    \item A class \cil{C}  implements \cil{I1} and \cil{I2} and \cil{I3}
+    \item The class \cil{C}  ust provide a body for all methods of \cil{I1}, all those of \cil{I2}, all those of \cil{I3}{\iz{
+      \item if \cil{I1}, \cil{I2}, \cil{I3} had common methods there would be no problem, each one should be implemented only once
+    }}
+    \item Instances of \cil{C} have type \cil{C}, but also types \cil{I1}, \cil{I2} and \cil{I3}
+  }}
+  \bl{Extension}{Possible declaration: \cil{interface I : I1, I2, I3 \{.. \}}
+  \iz{
+    \item An interface \cil{I} defines certain methods, in addition to those of \cil{I1}, \cil{I2}, \cil{I3}
+    \item A class \cil{C} that implements \cil{I} must provide a body for all methods indicated in \cil{I}, plus all those of \cil{I1}, all those of \cil{I2}, and all those of \cil{I3}
+    \item Instances of \cil{C} have type \cil{C}, but also types \cil{I}, \cil{I1}, \cil{I2} and \cil{I3}
+  }}
+}
+
+\fr{Example \Cil{IDevice}, \Cil{ILuminous}, \Cil{ILuminuousDevice}}{
+ \codeview{1}{129}{145}{\ssmall}{\codepath{SmartHome/Program.cs}}
+}
+
+\end{document}
+

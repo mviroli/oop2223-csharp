@@ -1,0 +1,7 @@
+Unhandled exception. NestedExceptions.SomeOtherException: Another message
+ ---> NestedExceptions.SomeException: A message
+   at NestedExceptions.Program.MethodPossiblyThrowingSomeException() in /path/to/NestedExceptions/Program.cs:line 30
+   at NestedExceptions.Program.MethodPossiblyThrowingSomeException() in /path/to/NestedExceptions/Program.cs:line 30
+   at NestedExceptions.Program.Main(String[] args) in /path/to/NestedExceptions/Program.cs:line 37
+   --- End of inner exception stack trace ---
+   at NestedExceptions.Program.Main(String[] args) in /path/to/NestedExceptions/Program.cs:line 41
