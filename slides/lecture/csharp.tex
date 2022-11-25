@@ -47,9 +47,9 @@
   \bl{C\# and .NET}{\iz{
     \item Designed by Anders Hejlsberg around 2000 at Microsoft
     \item Is part of the .NET initiative, designed to compile over the Common Language Infrastructure (CLI)
-    \item Current version is 10.0, released in 2021 for .NET 6.0
+    \item Current version of C\# is 11.0, released in 2022; current version of .NET is 7.0
     \item Mono is a free, open-source compiler and runtime environment
-    \item Initially developed as very similar to Java, then somewhat diverged
+    \item C\# Initially developed as very similar to Java, then somewhat diverged
     \item Essentially, C\# took a different path than Java in following Scala
     \item Shall in these slides refer to ``mainstream/standard OOP'' to mean the intersection of Java/C\#
     }}
@@ -60,7 +60,7 @@
     \item .NET started as a polyglot framework since its beginning
     \item C\# is by far the mostly used language
     \item Concepts replicate Java and JVM: CIL/bytecode, CLR/JVM, and so on
-    \item As a key difference, .NET initially targeted Microsoft Windows
+    \item As a key difference, .NET initially targeted only Microsoft Windows
     }}
   \fg{height = 0.4\textheight}{img/dotnet-overview.pdf}
 }
@@ -81,7 +81,7 @@
         \item Since \dotnet 5, implementations are aligned
     }}
     \bl{In these slides}{
-        Stick to \alert{\dotnet Core 3.1}, to maximise interoperability and to avoid compatibility issues
+        Stick to \alert{\dotnet 6}
     }
 \end{frame}
 
@@ -185,7 +185,7 @@
    }}
 }
 
-\frs{15}{Typical structure of an executable project} {
+\frs{25}{Typical structure of an executable project} {
    \bl{Entry point class} {\iz {
      \item it contains the \cil{Main} method
      \item typically, it contains only that method
@@ -204,6 +204,22 @@
     \item has one or many sources
     \item specify additional properties, and dependencies (references to other projects)
    }}
+   \bl{Solution}{\iz{
+    \item a folder with many projects, possibly with mutual dependencies
+    \item IDEs work with solutions
+   }}
+}
+
+\fr{Working with command line}{
+    \bl{Creating a new project into your solution}{\iz{
+        \item into a new folder\dots
+        \item \texttt{dotnet new console} -- creates a source with top-level hello-world print
+        \item \texttt{dotnet new console --use-program-main} -- creates a source with namespace, class and main method
+    }}
+    \bl{Run the project}{\iz{
+        \item namely, run the main method\dots
+        \item \texttt{dotnet run}
+    }}
 }
 
 \fr{A class \Cil{Person}}{
@@ -266,22 +282,25 @@
 }
 
 
-\frs{15}{Properties}{
+\frs{20}{Properties}{
     \bl{Improving over Get/Set accessors}{\iz{
         \item C\# introduces a programming construct for properties
-        \item a property is directly perceived by the client as a sort of field (starting with uppercase)
-        \item internally to a class, a property is actually a getter and/or setter with special syntax
+        \item a property is syntactically perceived by the client as a sort of field (starting with uppercase)
+        \item semantically however, it has to be considered as a pair of getter anf setter
+        \item a \cil{readonly} property is just a getter
+        \item in the class, a property is defined by special convenient syntax
     }}
-    \bl{Notation}{\iz{
+    \bl{Case 1: General notation}{\iz{
         \item \cil{public <type> <name>\{ get \{...\} set \{...\} \}}
-        \item the body of \cil{get} should return a value
-        \item the body of \cil{set} can use a special variable \cil{value}
+        \item the body of \cil{get} should return a value, of \cil{set} can use a special variable \cil{value}
         \item for both we can use expression-bodied get/set
         \item \cil{get} or \cil{set} could be private
-        \item can use expression-bodied readonly property in one line
     }}
-    \bl{The special case of auto-implemented properties}{\iz{
+    \bl{Case 2: Auto-implemented properties}{\iz{
         \item if the body of \cil{get} and \cil{set} are entirely skipped, a field with same name of the property is implicitly defined
+    }}
+    \bl{Case 3: Expression-bodied getter}{\iz{
+        \item an expression-bodied getter with no parenthesis is perceived as read-only property
     }}
 }
 
@@ -428,6 +447,8 @@
 
     \codeview{3}{9}{19}{\scriptsize}{\codepath{Snippets/Snippet7Nullables.cs}}
 \end{frame}
+
+\end{document}
 
 \section{Encapsulation, interfaces}
 \renewcommand{\codepath}[1]{../../code/lecture-03/#1}
