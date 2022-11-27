@@ -8,16 +8,16 @@ namespace SmartHome
 
       void SwitchOff();
 
-      bool IsOn { get; }
+      bool On { get; }
    }
    
    public class Lamp : IDevice
    {
-      public void SwitchOn() => IsOn = true;
+      public void SwitchOn() => On = true;
 
-      public void SwitchOff() => IsOn = false;
+      public void SwitchOff() => On = false;
 
-      public bool IsOn { get; private set; }
+      public bool On { get; private set; }
       
       // additional methods can be added if needed
    }
@@ -32,27 +32,27 @@ namespace SmartHome
 
       public void SwitchOff() => _on = _random.NextDouble() < 0.05;
 
-      public bool IsOn { get => _on; }
+      public bool On =>_on;
       
       // additional methods can be added if needed
    }
    
    public class TV : IDevice
    {
-      public void SwitchOn() => IsOn = true;
+      public void SwitchOn() => On = true;
 
-      public void SwitchOff() => IsOn = false;
+      public void SwitchOff() => On = false;
 
-      public bool IsOn { get; private set; }
+      public bool On { get; private set; }
    }
    
    public class Radio : IDevice
    {
-      public void SwitchOn() => IsOn = true;
+      public void SwitchOn() => On = true;
 
-      public void SwitchOff() => IsOn = false;
+      public void SwitchOff() => On = false;
 
-      public bool IsOn { get; private set; }
+      public bool On { get; private set; }
    }
 
    public class WorkWithDevices
@@ -100,11 +100,11 @@ namespace SmartHome
          }
       }
       
-      public bool IsCompletelyOn {
+      public bool CompletelyOn {
          get
          { 
             foreach (var device in _devices){
-              if (device != null && device.IsOn) return true;
+              if (device != null && device.On) return true;
             }
             return false;
          }
@@ -121,7 +121,7 @@ namespace SmartHome
          smartHome.InstallDevice(2,new Lamp());
          smartHome.InstallDevice(3,new Radio());
          smartHome.SwitchAll(true);
-         Console.WriteLine(smartHome.IsCompletelyOn);
+         Console.WriteLine(smartHome.CompletelyOn);
          
       }
    }
@@ -133,10 +133,10 @@ namespace SmartHome
    }
    public class NewLamp : IDevice, ILuminous
    {
-      public bool IsOn { get; private set; }
+      public bool On { get; private set; }
       private int _intensity;
-      public void SwitchOn() => IsOn = true;
-      public void SwitchOff() => IsOn = false;
+      public void SwitchOn() => On = true;
+      public void SwitchOff() => On = false;
       public void Dim() => _intensity--;
       public void Brighten() => _intensity++;
    }

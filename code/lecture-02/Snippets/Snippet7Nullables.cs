@@ -17,6 +17,7 @@ namespace Snippets
            
             String aString = aNullableInt?.ToString(); // null
             String aString2 = aNullableInt2?.ToString(); // "6"
+            String aString3 = aString ?? ""; // ""
         }
     }
 }

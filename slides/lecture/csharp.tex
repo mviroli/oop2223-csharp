@@ -185,7 +185,16 @@
    }}
 }
 
-\frs{25}{Typical structure of an executable project} {
+\frs{25}{Structure of an executable ``project'' into a ``solution''} {
+    \bl{Solution}{\iz{
+    \item a folder with many projects, possibly with mutual dependencies
+    \item IDEs work with solutions
+   }}
+   \bl{Project}{\iz{
+    \item has a name
+    \item has one or many sources
+    \item specify additional properties, and dependencies (references to other projects)
+   }}
    \bl{Entry point class} {\iz {
      \item it contains the \cil{Main} method
      \item typically, it contains only that method
@@ -199,15 +208,7 @@
     \item declared one or more classes, enclosing them in \cil{namespace}s
     \item a \cil{namespace} is a ``module'' giving a context to the class
    }}
-   \bl{Project}{\iz{
-    \item has a name
-    \item has one or many sources
-    \item specify additional properties, and dependencies (references to other projects)
-   }}
-   \bl{Solution}{\iz{
-    \item a folder with many projects, possibly with mutual dependencies
-    \item IDEs work with solutions
-   }}
+   
 }
 
 \fr{Working with command line}{
@@ -215,6 +216,9 @@
         \item into a new folder\dots
         \item \texttt{dotnet new console} -- creates a source with top-level hello-world print
         \item \texttt{dotnet new console --use-program-main} -- creates a source with namespace, class and main method
+    }}
+    \bl{Build the project}{\iz{
+        \item \texttt{dotnet build}
     }}
     \bl{Run the project}{\iz{
         \item namely, run the main method\dots
@@ -282,14 +286,23 @@
 }
 
 
-\frs{20}{Properties}{
-    \bl{Improving over Get/Set accessors}{\iz{
+\fr{Properties}{
+    \bl{Solving the getter/setter dilemma}{\iz{
+        \item we know we never want to expose fields, not to break encapsulation
+        \item still reading/writing ``pieces'' of an object is very frequent
+        \item getters/setters are verbose and boring, and may hide intent
+        \item need a mechanism with field syntax but getters/setter semantics
+    }}
+    \bl{\alert{Properties}: Improving over Get/Set accessors}{\iz{
         \item C\# introduces a programming construct for properties
         \item a property is syntactically perceived by the client as a sort of field (starting with uppercase)
-        \item semantically however, it has to be considered as a pair of getter anf setter
+        \item semantically however, it has to be considered as a pair of getter and setter
         \item a \cil{readonly} property is just a getter
         \item in the class, a property is defined by special convenient syntax
     }}
+}
+
+\frs{5}{Properties syntax}{
     \bl{Case 1: General notation}{\iz{
         \item \cil{public <type> <name>\{ get \{...\} set \{...\} \}}
         \item the body of \cil{get} should return a value, of \cil{set} can use a special variable \cil{value}
@@ -304,11 +317,11 @@
     }}
 }
 
-\fr{\Cil{Person} with Properties}{
+\fr{\Cil{Person} with Properties (cases 2 and 3)}{
 \codeview{1}{5}{33}{\tiny}{\codepath{PersonProperties/Program.cs}}
 }
 
-\frs{5}{\Cil{Person} with Properties: playing with properties}{
+\frs{5}{\Cil{Person} with Properties: (cases 1,2 and 3)}{
 \codeview{1}{20}{50}{\tiny}{\codepath{PersonPropertiesPlay/Program.cs}}
 }
 
@@ -408,6 +421,7 @@
 
 \begin{frame}[shrink=5]{\dotnet Nullables}
     \bl{Nullable types definition}{\iz{
+        \item a reference type (classes, interfaces, \dots) is nullable, and also\dots
         \item let \texttt{\textit{T}} by a \alert{value} type of any sort, then \texttt{\textit{T}\alert{?}} denotes the \alert{nullable \texttt{\textit{T}}} type
 
         \item A nullable type \texttt{\textit{T}?} can be defined as \texttt{\textit{T}} $\cup$ \{ \texttt{null} \}.
@@ -445,10 +459,8 @@
         \end{itemize}
     \end{block}
 
-    \codeview{3}{9}{19}{\scriptsize}{\codepath{Snippets/Snippet7Nullables.cs}}
+    \codeview{3}{9}{20}{\scriptsize}{\codepath{Snippets/Snippet7Nullables.cs}}
 \end{frame}
-
-\end{document}
 
 \section{Encapsulation, interfaces}
 \renewcommand{\codepath}[1]{../../code/lecture-03/#1}
@@ -514,7 +526,7 @@
   \bl{What is an \cil{interface}}{\iz{
     \item It is a new declarable \alert{reference type} (like classes)
     \item It has a name, and includes a set of method signatures (and properties)
-    \item It cannot be used to create objects the \cil{new} operator
+    \item It cannot be used to create objects by the \cil{new} operator
   }}
   \bl{An \cil{interface} \cil{I} can be ``implemented'' by a class}{\iz{
     \item Through a class \cil{C} that explicitly declares it (\cil{class C : I \{.. \}})
@@ -554,6 +566,8 @@
     \item Instances of \cil{C} have type \cil{C}, but also types \cil{I}, \cil{I1}, \cil{I2} and \cil{I3}
   }}
 }
+
+
 
 \section{Inheritance}
 \renewcommand{\codepath}[1]{../../code/lecture-04/#1}
@@ -623,7 +637,7 @@
     \item This can be done by rewriting in the subclass one (or more) of the methods/properties of the superclass -- called an \alert{override}
     \item To do so, methods/properties in the base class must be declared \cil{virtual}, and those in the subclass \cil{override}
     \item If necessary, the rewritten method can invoke the version of the parent using the special receiver \cil{base}
-    \item It is possible to ``hide'' a method in the superclass that is not \cil{virtual}, by the modifier \cil{new} -- but this mechanis is optional, and arguably with limited use
+    \item It is possible to ``hide'' a method of the superclass that is not \cil{virtual}, by the modifier \cil{new} -- but this mechanis is optional, and arguably with limited use
     \item A class can be declared \cil{sealed} to prevent extension
     
   }}
@@ -1426,6 +1440,439 @@
 \fr{The used \Cil{Person} class}{
   \codeview{1}{7}{26}{\tiny}{\codepath{LINQExample/Program.cs}}
 }
+
+\section{Additional C\# mechanisms}
+\renewcommand{\codepath}[1]{../../code/lecture-08/#1}
+
+\subsection{Extension Methods}
+
+\begin{frame}[allowframebreaks]{Extension Methods}
+  \begin{block}{Extension Methods -- General Rules}
+    \begin{itemize}
+      \item Method defined in non-generic, non-nested static classes can be marked as extensions
+      \item The first argument of an extension method is marked by \texttt{this}
+      \item Extension methods may work as ordinary static methods\ldots
+      \item \ldots but they can also be called as if they were instance methods
+      %
+      \begin{itemize}
+        \item[!] instance methods of the type of the argument marked by \texttt{this}
+      \end{itemize}
+      \item Their use case is to add functionalities to a pre-existing type
+      %
+      \begin{itemize}
+        \item whose definition cannot or should not be extended/altered
+        %
+        \begin{itemize}
+          \item[eg] interfaces, sealed classes, structures, enums, etc.
+        \end{itemize}
+        \item without requiring any edit to the type definiton
+      \end{itemize}
+    \end{itemize}
+  \end{block}
+
+  \framebreak
+
+  Consider for instance the following method:
+  %
+  \codeview{2}{11}{20}{\tiny}{\codepath{ExtensionMethods/Program.cs}}
+  %
+  \begin{itemize}
+    \item it aims at converting a string into \texttt{AlTeRnAtE CaSe}
+    \item it exploits a \texttt{StringBuilder}
+    %
+    \begin{itemize}
+      \item[ie] an object aimed at creating a string incrementally
+    \end{itemize}
+    \item notice the first argument is of type \texttt{string} and it is marked by \texttt{this}
+    %
+    \begin{itemize}
+      \item meaning that this is an extension method, extending the \texttt{string} type
+      %
+      \begin{itemize}
+        \item[$\rightarrow$] the method can be invoked on strings as an instance method:
+        %
+        \codeview{3}{42}{43}{\tiny}{\codepath{ExtensionMethods/Program.cs}}
+      \end{itemize}
+    \end{itemize}
+  \end{itemize}
+
+  \framebreak
+
+  \begin{alertblock}{Generic Extension Method}
+    \begin{itemize}
+      \item Common practice: combining extension and generic methods\ldots
+      \item \ldots to add functionalities to a wide range of type at once
+    \end{itemize}
+  \end{alertblock}
+
+  \framebreak
+
+  Consider for instance the following method:
+  %
+  \codeview{2}{22}{35}{\tiny}{\codepath{ExtensionMethods/Program.cs}}
+  %
+  \begin{itemize}
+    \item it converts any enumerable of any type \texttt{T} into a string
+    \item where the items of the enumerable are representes as strings, separated by \texttt{delimiter}
+    \item and the whole string is wrapped between \texttt{prefix} and \texttt{suffix}
+  \end{itemize}
+
+  \tcodeview{3}{45}{49}{\tiny}{\codepath{ExtensionMethods/Program.cs}}{Usage Example}
+
+  \framebreak
+
+  \begin{alertblock}{Name clashing in Extension Methods}
+    \begin{itemize}
+      \item Of course an extension method may have the same name of some actual instance method of a type
+      \item[!] When this is the case, actual instace methods take priority over extension methods
+    \end{itemize}
+  \end{alertblock}
+
+  \framebreak
+
+  Consider for instance the following method:
+  %
+  \codeview{2}{37}{38}{\tiny}{\codepath{ExtensionMethods/Program.cs}}
+  %
+  \begin{itemize}
+    \item it is an extension methods for strings
+    \item notice the \texttt{String} class has an instance method named \texttt{ToUpper}
+    \item[$\rightarrow$] in case of ambiguity, the original method of \texttt{String} is invoked
+  \end{itemize}
+
+  \tcodeview{3}{51}{52}{\tiny}{\codepath{ExtensionMethods/Program.cs}}{One can reveal this rule as follows:}
+  %
+  \begin{itemize}
+    \item $1^{st}$ invocation is ambigous, then the original \texttt{ToUpper} method is called
+    \item $2^{nd}$ one is not, then the extension method is invoked
+    %
+    \begin{itemize}
+      \item which provokes an exception!
+    \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Enums}
+  \begin{block}{About enums}
+    \begin{itemize}
+      \item Enums are fixed-size groups of related constants
+      %
+      \begin{itemize}
+        \item[eg] days of week, months of the year, seasons, gender  
+      \end{itemize}
+
+      \item OOP languages usually represents groups of related constants as types
+      %
+      \begin{itemize}
+        \item \ldots having a fixed amount of instances
+      \end{itemize}
+
+      \item Such types are called \alert{enum} types, and they have an ad-hoc syntax
+
+      \item In \dotnet{} enums must be sub-types of some built-in integer type
+      %
+      \begin{itemize}
+        \item[ie] \texttt{(U)Int16/32/64}, or \texttt{(S)Byte}
+        \item[$\rightarrow$] \dotnet enums are value-types
+        \item[$\rightarrow$] \dotnet enums are integers 
+      \end{itemize}
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Syntax}
+    \begin{center}\ttfamily
+      enum \cscat{Name} \csopt{: \cscat{Integer Type}} \{ \cscat{Constants} \}
+    \end{center}
+    %
+    \begin{itemize}
+      \item where \texttt{\cscat{Name}} is the name of the enum type being defined
+      \item and \texttt{\cscat{Integer Type}} is one of \texttt{(U)Int16/32/64}, or \texttt{(S)Byte}
+      %
+      \begin{itemize}
+        \item defaults to \texttt{Int32} in case it is missing
+      \end{itemize}
+      \item and \cscat{Constants} is a number of comma-separated symbols in \texttt{PascalCase}
+      %
+      \begin{itemize}
+        \item optionally assigned to their values
+      \end{itemize}
+    \end{itemize}
+  \end{block}
+
+  \tcodeview{1}{5}{14}{\tiny}{\codepath{Enums/Program.cs}}{Example of \texttt{enum}}
+  \tcodeview{3}{51}{57}{\tiny}{\codepath{Enums/Program.cs}}{Usage of \texttt{enum}}
+  %
+  \begin{itemize}
+    \item notice enums are essentially integers
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Operators Overloading}
+  \begin{exampleblock}{Definition}\centering
+    Operator overloading is a feature letting OOP languages redefine the semantics of some operators on a per-type basis
+  \end{exampleblock}
+
+  \begin{block}{In \dotnet}
+    \begin{itemize}
+      \item \dotnet supports operator overloading on classes, via static methods
+      %
+      \begin{itemize}
+        \item since version 8, operator overloading is supported for interfaces too
+      \end{itemize}
+
+      \item only a predefined set of operators can be overloadaded
+      %
+      \begin{itemize}
+        \item[eg] \texttt{+}, \texttt{-}, \texttt{*}, \texttt{/}, \texttt{==}, \texttt{!=}, \texttt{>}, \texttt{<}, etc
+        \item priority and associativity of operators cannot be altered
+      \end{itemize}
+
+      \item classes/interfaces are not constrained to overload all operators
+      
+      \item explicit/implicit casts may be defined as well, via operator overloading
+      
+      \item some built-in classes overlead some operators
+      %
+      \begin{itemize}
+        \item[eg] \texttt{String} overloads at least \texttt{+}, \texttt{==}, and \texttt{!=}
+      \end{itemize}
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Syntax -- Unary Operator}
+    \begin{center}\ttfamily
+      public static \cscat{T$_2$} \alert{operator} \cscat{Symbol}\alert{(}\cscat{T$_1$} \cscat{N$_1$}\alert{)} \{ \cscat{Code} \}
+    \end{center}
+    %
+    \begin{itemize}
+      \item represents a unary operator producing an object of type \texttt{\cscat{T$_2$}} 
+      \item out an object of type \texttt{\cscat{T$_1$}}
+      \item which can be used with prefix syntax, via \texttt{\cscat{Symbol}}
+      %
+      \begin{itemize}
+        \item[eg] \texttt{+}, \texttt{-}, \texttt{!}, etc.
+      \end{itemize}
+      \item[!] commonly, \texttt{\cscat{T$_1$}} and \texttt{\cscat{T$_3$}} are equal to the hosting type
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Syntax -- Binary Operator}
+    \begin{center}\ttfamily
+      public static \cscat{T$_3$} \alert{operator} \cscat{Symbol}\alert{(}\cscat{T$_1$} \cscat{N$_1$}\alert{,} \cscat{T$_2$} \cscat{N$_2$}\alert{)} \\ \{ \cscat{Code} \}
+    \end{center}
+    %
+    \begin{itemize}
+      \item represents a binary operator producing an object of type \texttt{\cscat{T$_3$}} 
+      \item out of two objects of types \texttt{\cscat{T$_1$}} and \texttt{\cscat{T$_2$}}
+      \item which can be used with infix syntax, via \texttt{\cscat{Symbol}}
+      %
+      \begin{itemize}
+        \item[eg] \texttt{+}, \texttt{-}, \texttt{*}, \texttt{/}, \texttt{==}, \texttt{!=}, \texttt{>}, \texttt{<}, etc
+      \end{itemize}
+      \item[!] commonly, \texttt{\cscat{T$_1$}} and \texttt{\cscat{T$_2$}} are equal to the hosting type
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Syntax -- Cast Operator}
+    \begin{center}\ttfamily
+      public static \cscat{Usage}  \alert{operator} \cscat{T$_2$} \alert{(}\cscat{T$_1$} \cscat{N$_1$}\alert{)} \{ \cscat{Code} \}
+    \end{center}
+    %
+    \begin{itemize}
+      \item where \texttt{\cscat{Usage}} is either \alert{\texttt{implicit}} or \alert{\texttt{explicit}}
+      \item The notation above creates an implicit/explicit casting operator 
+      \item converting an object of type \texttt{\cscat{T$_1$}} into an object of type \texttt{\cscat{T$_2$}}
+      \item[!] commonly, \texttt{\cscat{T$_2$}} (resp. \texttt{\cscat{T$_1$}}) is equal to the hosting type for implicit (resp. explicit) operators
+      %
+      \begin{itemize}
+        \item usually other types are \alert{implictly} casted to the hosting type
+        \item usually the hosting type is \alert{excpliticly} casted to other type
+      \end{itemize} 
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Operators Overloading -- Example}
+  \tcodeview{1}{5}{48}{\tiny}{\codepath{OperatorOverloading/Program.cs}}{Complex Numers with Operators}
+  
+  \framebreak
+
+  Notice that:
+  %
+  \begin{itemize}
+    \item 1 unary operator (i.e. \texttt{-}), negating both components of a \texttt{Complex}
+    \item 4 binary operators (i.e. \texttt{+}, \texttt{-}, \texttt{/}, \texttt{*}) are defined to accept and return \texttt{Complex}es
+    %
+    \begin{itemize}
+      \item either working on real/imaginary components or on modulus and phase
+      \item[!] notice that binary minus is defined in terms of other operators
+    \end{itemize}
+    \item 2 comparison operators (i.e. \texttt{==}, \texttt{!=}) are defined in terms of \texttt{Complex.Equals}
+    \item implicit casts from \texttt{double} to \texttt{Complex} are allowed
+    %
+    \begin{itemize}
+      \item or from anything that can be implicitly casted to double, e.g. \texttt{int}
+    \end{itemize}
+    \item explicit casts from \texttt{Complex} to \texttt{double} are allowed
+    %
+    \begin{itemize}
+      \item but only work if the imaginary part is 0
+    \end{itemize}
+  \end{itemize}
+
+  \tcodeview{3}{54}{64}{\tiny}{\codepath{OperatorOverloading/Program.cs}}{Usage of Complex Numers with Operators}
+\end{frame}
+
+\begin{frame}{Operators Overloading -- Remarks}
+  \begin{alertblock}{Beware of Languages supporting Operator Overloading}
+    \begin{itemize}
+      \item You never know what's the meaning of an operator until you \alert{read the doc}
+      \item Nobody constrains developers to implement \alert{meaningful} operators
+      \item Do now endow your types with operators unless their meaning is \alert{obvious}!
+    \end{itemize}
+  \end{alertblock}
+
+  \begin{exampleblock}{Reference Comparison vs Value Comparison}
+    \begin{itemize}
+      \item Operators \texttt{==} and \texttt{!=} test identity by default
+      \item By they may be overloadaded to test for equality
+      \item When this is the case, how can identity be tested?
+      \item This is the purposed of the \texttt{Object.ReferenceEquals} static method
+    \end{itemize}
+  \end{exampleblock}
+\end{frame}
+
+
+\begin{frame}[allowframebreaks]{The Need for LINQ}
+  \begin{block}{Consider the algorithm \texttt{GetTripledFirstNEvenNumbers} which}
+    \begin{itemize}
+      \item accepts an enumerable of integers as input
+      \item and returns an enumerable containing no more than $N$ numbers\ldots
+      \item and these numbers are \alert{tripled} w.r.t. the \alert{first $N$ even} numbers in the input enumerable
+    \end{itemize}
+  \end{block}
+  %
+  \begin{itemize}
+    \item[eg] the algorithm applied to \texttt{[7, \alert{6}, \alert{2}, 9, \alert{10}, \alert{4}, 2, \ldots]}
+    %
+    \begin{itemize}
+      \item should return \texttt{[18, 6, 30, 12]}
+      \item provided that $N = 4$
+    \end{itemize} 
+  \end{itemize}
+
+  \framebreak
+
+  We may implement the algorithm as follows:
+  %
+  \codeview{2}{9}{20}{\tiny}{\codepath{Linq/Program.cs}}
+  %
+  \begin{itemize}
+    \item this implementation wastes a lot of memory and computational efforts!
+  \end{itemize}
+
+  \framebreak
+
+  We may then make it more efficient by short-circuiting the algorithm as soon as $N$ items have been found:
+  %
+  \codeview{2}{22}{35}{\tiny}{\codepath{Linq/Program.cs}}
+  %
+  \begin{itemize}
+    \item yet, this code steps through the unnecessary construction of an intermediate list
+    %
+    \begin{itemize}
+      \item this may be inefficient, e.g. in case of large $N$
+    \end{itemize}
+  \end{itemize}
+
+  \framebreak
+
+  We may then use \texttt{yield} to make the algorithm totally \alert{lazy}:
+  %
+  \codeview{2}{37}{48}{\tiny}{\codepath{Linq/Program.cs}}
+  %
+  \begin{itemize}
+    \item this is technically ok, but still very verbose
+    \item you need to carefully read it to understand what's going on
+  \end{itemize}
+
+  \begin{block}{Computational laziness}\centering\itshape
+    No computation is actually performed until the very last useful moment
+  \end{block}
+
+  \framebreak
+
+  We may rewrite the same algorithm in functional style, to make it more declarative:
+  %
+  \codeview{2}{50}{53}{\tiny}{\codepath{Linq/Program.cs}}
+  %
+  \begin{itemize}
+    \item laziness is retained
+    \item the code is more consise and declarative
+    \item ``phases'' of computation are made evident
+    \item[!] this is the essence of LINQ
+  \end{itemize}
+
+  \framebreak
+
+  We may also consider of re-writing the algorithm in SQL-like syntax:
+  %
+  \codeview{2}{55}{60}{\tiny}{\codepath{Linq/Program.cs}}
+  %
+  \begin{itemize}
+    \item this implies interpreting the input enumerable as an abstract database
+    \item more practical, if you are confident with SQL
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{LINQ -- Language-INtegrated Query}
+  \begin{block}{What is LINQ}
+    \begin{itemize}
+      \item A portion of the \dotnet framework
+      \item Aimed at manipulating any sort of data-source which can be enumerated
+      %
+      \begin{itemize}
+        \item ranging from in-memory collections, to remote databases, stepping through files
+      \end{itemize}
+      \item Via a rich library of high-order functions
+      \item and syntactical tricks aimed at making data manipulation very quick (to write)
+      %
+      \begin{itemize}
+        \item[eg] an (optional) SQL-like syntax
+      \end{itemize}
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{How does LINQ work}
+    \begin{itemize}
+      \item Via a bunch of extension methods defined in \texttt{System.Linq.\alert{Enumerable}}
+      \item Allowing several sorts of operations on any sort of \texttt{IEnumerable<T>}
+      \item Most notable sorts of operations:
+      %
+      \begin{description}
+        \item[provisioning] | a (possibly long/infinite) stream of data is lazily generated / read from some source
+        \item[transformation] | an enumerable is transformed into another enumerable
+        \item[reduction] | a value is computed out of an enumerable 
+      \end{description} 
+      \item Operations are \alert{pipelined}
+      %
+      \begin{itemize}
+        \item each operation is lazy, and it performs as less computations as possible
+      \end{itemize}
+    \end{itemize}
+  \end{block}
+
+  \begin{center}
+    \includegraphics[width=.7\linewidth]{img/linq.jpeg}
+  \end{center}
+
+  \tcodeview{2}{8}{20}{\tiny}{\codepath{LinqOperations/Program.cs}}{Example of provisioning operations}
+
+  \tcodeview{2}{22}{49}{\tiny}{\codepath{LinqOperations/Program.cs}}{Example of transformation operations}
+
+  \tcodeview{2}{51}{63}{\tiny}{\codepath{LinqOperations/Program.cs}}{Example of reduction operations}
+\end{frame}
 
 
 \end{document}

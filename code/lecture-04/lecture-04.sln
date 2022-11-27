@@ -10,8 +10,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BiCounterFields", "BiCounte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LimitCounter", "LimitCounter\LimitCounter.csproj", "{4334FA5F-4B0E-451C-AD4A-D5009FB8588B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnlimitedCounter", "UnlimitedCounter\UnlimitedCounter.csproj", "{E52851B5-D7BB-4CFC-99BF-7F58296EAF71}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolyObject", "PolyObject\PolyObject.csproj", "{7AD68B35-51E6-4C73-A1CE-418DD012BC69}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonRuntime", "PersonRuntime\PersonRuntime.csproj", "{682D9FB2-C102-4239-A6F6-DBE17B80F671}"
@@ -46,10 +44,6 @@ Global
 		{4334FA5F-4B0E-451C-AD4A-D5009FB8588B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4334FA5F-4B0E-451C-AD4A-D5009FB8588B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4334FA5F-4B0E-451C-AD4A-D5009FB8588B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E52851B5-D7BB-4CFC-99BF-7F58296EAF71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E52851B5-D7BB-4CFC-99BF-7F58296EAF71}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E52851B5-D7BB-4CFC-99BF-7F58296EAF71}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E52851B5-D7BB-4CFC-99BF-7F58296EAF71}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7AD68B35-51E6-4C73-A1CE-418DD012BC69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7AD68B35-51E6-4C73-A1CE-418DD012BC69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AD68B35-51E6-4C73-A1CE-418DD012BC69}.Release|Any CPU.ActiveCfg = Release|Any CPU
